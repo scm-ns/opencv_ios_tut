@@ -18,6 +18,8 @@
 		36939DC11E5E6DC500F7E160 /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 36939DC01E5E6DC500F7E160 /* CoreMedia.framework */; };
 		36939DC31E5E6DC500F7E160 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 36939DC21E5E6DC500F7E160 /* AVFoundation.framework */; };
 		36939DC41E5E6DC500F7E160 /* opencv2.framework in Resources */ = {isa = PBXBuildFile; fileRef = 36939DB91E5E6DC500F7E160 /* opencv2.framework */; };
+		36D137331E5E181900B7F1FE /* UIImage+OpenCV.mm in Sources */ = {isa = PBXBuildFile; fileRef = 36D137321E5E181900B7F1FE /* UIImage+OpenCV.mm */; };
+		36D137351E5E395300B7F1FE /* ImageIO.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 36D137341E5E395300B7F1FE /* ImageIO.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -25,7 +27,7 @@
 		36939DA01E5E6DC400F7E160 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		36939DA21E5E6DC400F7E160 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		36939DA31E5E6DC400F7E160 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
-		36939DA51E5E6DC400F7E160 /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
+		36939DA51E5E6DC400F7E160 /* ViewController.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; path = ViewController.h; sourceTree = "<group>"; };
 		36939DA61E5E6DC400F7E160 /* ViewController.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ViewController.mm; sourceTree = "<group>"; };
 		36939DAB1E5E6DC400F7E160 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		36939DB01E5E6DC500F7E160 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -36,6 +38,9 @@
 		36939DBE1E5E6DC500F7E160 /* CoreImage.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreImage.framework; path = System/Library/Frameworks/CoreImage.framework; sourceTree = SDKROOT; };
 		36939DC01E5E6DC500F7E160 /* CoreMedia.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMedia.framework; path = System/Library/Frameworks/CoreMedia.framework; sourceTree = SDKROOT; };
 		36939DC21E5E6DC500F7E160 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
+		36D137311E5E181900B7F1FE /* UIImage+OpenCV.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+OpenCV.h"; sourceTree = "<group>"; };
+		36D137321E5E181900B7F1FE /* UIImage+OpenCV.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = "UIImage+OpenCV.mm"; sourceTree = "<group>"; };
+		36D137341E5E395300B7F1FE /* ImageIO.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ImageIO.framework; path = System/Library/Frameworks/ImageIO.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -43,6 +48,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				36D137351E5E395300B7F1FE /* ImageIO.framework in Frameworks */,
 				36939DC31E5E6DC500F7E160 /* AVFoundation.framework in Frameworks */,
 				36939DC11E5E6DC500F7E160 /* CoreMedia.framework in Frameworks */,
 				36939DBF1E5E6DC500F7E160 /* CoreImage.framework in Frameworks */,
@@ -83,6 +89,8 @@
 				36939DAB1E5E6DC400F7E160 /* Assets.xcassets */,
 				36939DB01E5E6DC500F7E160 /* Info.plist */,
 				36939D9F1E5E6DC400F7E160 /* Supporting Files */,
+				36D137311E5E181900B7F1FE /* UIImage+OpenCV.h */,
+				36D137321E5E181900B7F1FE /* UIImage+OpenCV.mm */,
 			);
 			path = opencv.tut;
 			sourceTree = "<group>";
@@ -98,6 +106,7 @@
 		36939DB61E5E6DC500F7E160 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				36D137341E5E395300B7F1FE /* ImageIO.framework */,
 				36939DC21E5E6DC500F7E160 /* AVFoundation.framework */,
 				36939DC01E5E6DC500F7E160 /* CoreMedia.framework */,
 				36939DBE1E5E6DC500F7E160 /* CoreImage.framework */,
@@ -181,6 +190,7 @@
 			files = (
 				36939DA71E5E6DC400F7E160 /* ViewController.mm in Sources */,
 				36939DA41E5E6DC400F7E160 /* AppDelegate.m in Sources */,
+				36D137331E5E181900B7F1FE /* UIImage+OpenCV.mm in Sources */,
 				36939DA11E5E6DC400F7E160 /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
