@@ -7,9 +7,12 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "EAGLView.h"
+
 
 @interface ViewController : UIViewController
 @property (strong) UIImageView* imageView;
 
+@property (strong) EAGLView *glView;
 @end
 

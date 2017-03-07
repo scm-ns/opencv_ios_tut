@@ -1,0 +1,30 @@
+{
+  "DVTSourceControlWorkspaceBlueprintPrimaryRemoteRepositoryKey" : "2693F004B4464AE5C6D5CEEB02C2BA4A4F43E6CA",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyRepositoryLocationsKey" : {
+
+  },
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyStatesKey" : {
+    "2693F004B4464AE5C6D5CEEB02C2BA4A4F43E6CA" : 9223372036854775807,
+    "CE3D7499BEF6CE07693F5D2B1D225DD710BB1908" : 9223372036854775807
+  },
+  "DVTSourceControlWorkspaceBlueprintIdentifierKey" : "2B5C3F7B-BC6E-40FB-9B60-6D2A35582506",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyPathsKey" : {
+    "2693F004B4464AE5C6D5CEEB02C2BA4A4F43E6CA" : "opencv.tut\/",
+    "CE3D7499BEF6CE07693F5D2B1D225DD710BB1908" : "code\/"
+  },
+  "DVTSourceControlWorkspaceBlueprintNameKey" : "opencv.tut",
+  "DVTSourceControlWorkspaceBlueprintVersion" : 204,
+  "DVTSourceControlWorkspaceBlueprintRelativePathToProjectKey" : "opencv.tut.xcodeproj",
+  "DVTSourceControlWorkspaceBlueprintRemoteRepositoriesKey" : [
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/scm-ns\/opencv_ios_tut.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "2693F004B4464AE5C6D5CEEB02C2BA4A4F43E6CA"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "github.com:MasteringOpenCV\/code.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "CE3D7499BEF6CE07693F5D2B1D225DD710BB1908"
+    }
+  ]
+}

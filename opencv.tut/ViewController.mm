@@ -6,17 +6,24 @@
 //  Copyright © 2017 scm197. All rights reserved.
 //
 
+// Copy of the work done by the author of Mastering open cv with practical projects
+
 #import "ViewController.h"
+#import "KeyPointDetector.hpp"
+#import "SimpleVisualizationController.h"
 #import <opencv2/videoio/cap_ios.h>
 
 @interface ViewController ()<CvVideoCameraDelegate>
 {
     CvVideoCamera* videoCamera;
+    KeyPointDetector * markerDetector;
+    SimpleVisualizationController * visualController;
 }
 @end
 
-@implementation ViewController
 
+@implementation ViewController
+@synthesize glView;
 
 -(instancetype)init
 {
@@ -24,6 +31,9 @@
     {
         _imageView = [[UIImageView alloc] init];
         videoCamera = [self setupVideoCameraWithView:_imageView];
+        markerDetector = new KeyPointDetector(CameraCalibration(6.24860291e+02 * (640./352.), 6.24860291e+02 * (480./288.), 640 * 0.5f, 480 * 0.5f));
+        
+        glView = [[EAGLView alloc] initWithFrame:CGRectMake(50, 50, 200, 300)];
     }
     
     return self;
@@ -41,23 +51,12 @@
     return cam;
 }
 
-
-- (void)processImage:(cv::Mat &)image
-{
-    cv::Mat image_copy;
-    cvtColor(image, image_copy, CV_BGRA2BGR);
-    
-    // invert image
-    bitwise_not(image_copy, image_copy);
-    cvtColor(image_copy, image, CV_BGR2BGRA);
-
-}
-
-
 - (void)viewDidLoad {
     [super viewDidLoad];
     [self layoutImageView];
     self.view.backgroundColor = [UIColor yellowColor];
+
+    [self.view addSubview:glView];
     
     // Do any additional setup after loading the view, typically from a nib.
 }
@@ -72,6 +71,18 @@
     
 }
 
+- (void)viewWillAppear:(BOOL)animated
+{
+    [self.glView initContext];
+    CGSize frameSize = [self getFrameSize];
+    
+    CameraCalibration cam =  CameraCalibration(6.24860291e+02 * (640./352.), 6.24860291e+02 * (480./288.), 640 * 0.5f, 480 * 0.5f);
+    visualController = [[SimpleVisualizationController alloc] initWithGLView:self.glView calibration:cam frameSize:frameSize];
+   
+    
+    [super viewWillAppear:animated];
+}
+
 -(void) layoutImageView
 {
     _imageView.translatesAutoresizingMaskIntoConstraints = NO;
@@ -84,18 +95,69 @@
    
     NSMutableArray<NSLayoutConstraint *> *contrains = [[NSMutableArray alloc] initWithArray:[NSLayoutConstraint constraintsWithVisualFormat:formatStr_H options:0 metrics:nil views:NSDictionaryOfVariableBindings(_imageView)]];
     
-    
     [contrains addObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:formatStr_V options:0 metrics:nil views:NSDictionaryOfVariableBindings(_imageView)]];
-    
+   
+
     [NSLayoutConstraint activateConstraints:contrains];
 }
 
 
-- (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
+-(CGSize) getFrameSize
+{
+   if(![[videoCamera captureSession] isRunning])
+   {
+       NSLog(@"No camera input");
+       return CGSizeZero;
+   }
+   
+    
+    NSArray * ports = [[videoCamera captureSession] inputs];
+    AVCaptureInputPort* usedPort = nil;
+    for (AVCaptureInputPort *port in ports)
+    {
+        if (usedPort == nil || [port.mediaType isEqualToString:AVMediaTypeVideo] )
+        {
+            usedPort = port ;
+        }
+    }
+    if(usedPort == nil) return CGSizeZero;
+    
+    CMFormatDescriptionRef format = usedPort.formatDescription;
+    CMVideoDimensions dim =  CMVideoFormatDescriptionGetDimensions(format);
+    
+    return CGSizeMake(dim.width, dim.height);
 }
 
+
+//MARK : Computer Vision
+
+
+- (void)processImage:(cv::Mat &)image
+{
+    cv::Mat image_copy;
+    //markerDetector->processFrame(image);
+    //std::vector<Transformation> trans = markerDetector->getTransformations();
+    
+    //NSLog(@"Size : %lu" , trans.size());
+  
+    //[visualController setTransformationList:trans];
+    
+    cv::cvtColor(image, image_copy, CV_BGR2BGRA);
+    
+      // Start upload new frame to video memory in main thread
+    dispatch_sync( dispatch_get_main_queue(), ^{
+        [visualController updateBackground:image_copy];
+    });
+    
+    // And perform processing in current thread
+    //markerDetector->processFrame(image);
+    
+    // When it's done we query rendering from main thread
+    dispatch_async( dispatch_get_main_queue(), ^{
+        //[visualController setTransformationList:markerDetector->getTransformations()];
+        [visualController drawFrame];
+    });  
+}
 
 
 
