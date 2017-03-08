@@ -1,14 +1,4 @@
-/*****************************************************************************
- *   SimpleVisualizationController.mm
- *   Example_MarkerBasedAR
- ******************************************************************************
- *   by Khvedchenia Ievgen, 5th Dec 2012
- *   http://computer-vision-talks.com
- ******************************************************************************
- *   Ch2 of the book "Mastering OpenCV with Practical Computer Vision Projects"
- *   Copyright Packt Publishing 2012.
- *   http://www.packtpub.com/cool-projects-with-opencv/book
- **********************************:jkk:q*******************************************/
+
 
 #import "SimpleVisualizationController.h"
 #import <OpenGLES/ES1/gl.h>
@@ -142,7 +132,6 @@
     glLoadIdentity();
     glLoadMatrixf(proj);
     
-   // glOrthof(0.0, w, h, 0, 1, -1);
     
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
@@ -178,7 +167,13 @@
     [self buildProjectionMatrix:m_calibration.getIntrinsic():m_frameSize.width :m_frameSize.height :projectionMatrix];
     
     glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    
+
     glLoadMatrixf(projectionMatrix.data); // how does open gl use ?
+    
+   // glLoadMatrixf(projectionMatrix.data); // how does open gl use ?
+
     // Yep it uses this to convert from the 3D model into camera iamge
     
     glMatrixMode(GL_MODELVIEW);
@@ -213,7 +208,18 @@
     };
    
     // for each marker that has been identified do something ?
+   
+    // The prespective projection will convert from the camera-model 3D space into the 2D space.
+   
+    // the transformation matrix knows how to move the 3d model in such a way that it is located on
+    // top the correct marker space.
+   
+    // So we use apply this transform to move to the right location and then draw the square there.
+    
     // Nope draw a model :w
+    
+    // There are two places where all of this could go wrong.
+    
     for (size_t transformationIndex=0; transformationIndex<m_transformations.size(); transformationIndex++)
     {
         const Transformation& transformation = m_transformations[transformationIndex];
@@ -234,7 +240,7 @@
         float scale = 0.5;
         glScalef(scale, scale, scale);
         
-        glTranslatef(0, 0, 0.1f);
+        glTranslatef(0, 0, 0.1);
         
         glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
         glVertexPointer(3, GL_FLOAT, 0, lineX);
@@ -270,7 +276,7 @@
     }
 
     // Draw 3D objects on the position of the detected markers
-    //[self drawAR];
+    [self drawAR];
     
     {
         int glErCode = glGetError();
@@ -280,8 +286,7 @@
         }
     }
 
-    //[self drawOpenGL];
-    
+
     // Present framebuffer
     bool ok = [m_glview presentFramebuffer];
 

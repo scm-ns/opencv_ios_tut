@@ -18,6 +18,7 @@
     CvVideoCamera* videoCamera;
     KeyPointDetector * markerDetector;
     SimpleVisualizationController * visualController;
+    CameraCalibration * camCal;
 }
 @end
 
@@ -31,9 +32,12 @@
     {
         _imageView = [[UIImageView alloc] init];
         videoCamera = [self setupVideoCameraWithView:_imageView];
-        markerDetector = new KeyPointDetector(CameraCalibration(6.24860291e+02 * (640./352.), 6.24860291e+02 * (480./288.), 640 * 0.5f, 480 * 0.5f));
+        camCal = new CameraCalibration(1350,1200 , 150, 200);
         
-        glView = [[EAGLView alloc] initWithFrame:CGRectMake(50, 50, 200, 300)];
+        
+        markerDetector = new KeyPointDetector(*(camCal));
+        glView = [[EAGLView alloc] initWithFrame:CGRectMake(10, 10, 300, 500)];
+        
     }
     
     return self;
@@ -76,8 +80,7 @@
     [self.glView initContext];
     CGSize frameSize = [self getFrameSize];
     
-    CameraCalibration cam =  CameraCalibration(6.24860291e+02 * (640./352.), 6.24860291e+02 * (480./288.), 640 * 0.5f, 480 * 0.5f);
-    visualController = [[SimpleVisualizationController alloc] initWithGLView:self.glView calibration:cam frameSize:frameSize];
+    visualController = [[SimpleVisualizationController alloc] initWithGLView:self.glView calibration:*(camCal) frameSize:self.glView.bounds.size];
    
     
     [super viewWillAppear:animated];
@@ -135,14 +138,8 @@
 - (void)processImage:(cv::Mat &)image
 {
     cv::Mat image_copy;
-    //markerDetector->processFrame(image);
-    //std::vector<Transformation> trans = markerDetector->getTransformations();
     
-    //NSLog(@"Size : %lu" , trans.size());
-  
-    //[visualController setTransformationList:trans];
-    
-    cv::cvtColor(image, image_copy, CV_BGR2BGRA);
+    cv::cvtColor(image, image_copy, CV_RGB2BGRA);
     
       // Start upload new frame to video memory in main thread
     dispatch_sync( dispatch_get_main_queue(), ^{
@@ -150,11 +147,17 @@
     });
     
     // And perform processing in current thread
-    //markerDetector->processFrame(image);
+    
+    markerDetector->processFrame(image);
+    std::vector<Transformation> trans = markerDetector->getTransformations();
+    
+    NSLog(@"Size : %lu" , trans.size());
+  
+    
     
     // When it's done we query rendering from main thread
     dispatch_async( dispatch_get_main_queue(), ^{
-        //[visualController setTransformationList:markerDetector->getTransformations()];
+        [visualController setTransformationList:trans];
         [visualController drawFrame];
     });  
 }
