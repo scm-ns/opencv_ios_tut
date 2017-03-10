@@ -229,6 +229,7 @@
         glLoadMatrixf(reinterpret_cast<const GLfloat*>(&glMatrix.data[0]));
         
         // draw data
+        // Draw the Square
         glVertexPointer(2, GL_FLOAT, 0, squareVertices);
         glEnableClientState(GL_VERTEX_ARRAY);
         glColorPointer(4, GL_UNSIGNED_BYTE, 0, squareColors);
@@ -237,11 +238,11 @@
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
         glDisableClientState(GL_COLOR_ARRAY);
         
-        float scale = 0.5;
+        float scale = 0.5; // This ensure that the lines are half the size of the square
         glScalef(scale, scale, scale);
         
         glTranslatef(0, 0, 0.1);
-        
+        // Draw the different lines
         glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
         glVertexPointer(3, GL_FLOAT, 0, lineX);
         glDrawArrays(GL_LINES, 0, 2);
