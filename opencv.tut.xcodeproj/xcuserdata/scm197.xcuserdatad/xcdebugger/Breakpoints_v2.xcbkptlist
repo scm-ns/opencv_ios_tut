@@ -90,12 +90,12 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "opencv.tut/SimpleVisualizationController.mm"
-            timestampString = "510656579.258072"
+            timestampString = "510817787.822668"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "278"
-            endingLineNumber = "278"
-            landmarkName = "-drawFrame"
+            startingLineNumber = "364"
+            endingLineNumber = "364"
+            landmarkName = "-drawOpenGL"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -346,12 +346,12 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "opencv.tut/SimpleVisualizationController.mm"
-            timestampString = "510656579.258072"
+            timestampString = "510817787.822668"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "253"
-            endingLineNumber = "253"
-            landmarkName = "-drawAR"
+            startingLineNumber = "338"
+            endingLineNumber = "338"
+            landmarkName = "-drawOpenGL"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -538,12 +538,12 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "opencv.tut/SimpleVisualizationController.mm"
-            timestampString = "510656579.258072"
+            timestampString = "510817787.822668"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "232"
-            endingLineNumber = "232"
-            landmarkName = "-drawAR"
+            startingLineNumber = "317"
+            endingLineNumber = "317"
+            landmarkName = "-drawFrame"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -554,12 +554,12 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "opencv.tut/SimpleVisualizationController.mm"
-            timestampString = "510656579.258072"
+            timestampString = "510817787.822668"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "254"
-            endingLineNumber = "254"
-            landmarkName = "-drawAR"
+            startingLineNumber = "339"
+            endingLineNumber = "339"
+            landmarkName = "-drawOpenGL"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -570,12 +570,12 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "opencv.tut/SimpleVisualizationController.mm"
-            timestampString = "510656579.258072"
+            timestampString = "510817787.822668"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "255"
-            endingLineNumber = "255"
-            landmarkName = "-drawAR"
+            startingLineNumber = "340"
+            endingLineNumber = "340"
+            landmarkName = "-drawOpenGL"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -592,6 +592,38 @@
             startingLineNumber = "80"
             endingLineNumber = "80"
             landmarkName = "-buildProjectionMatrix::::"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "opencv.tut/SimpleVisualizationController.mm"
+            timestampString = "510797063.343462"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "404"
+            endingLineNumber = "404"
+            landmarkName = "-createOpenGLTextureFromImage:"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "opencv.tut/SimpleVisualizationController.mm"
+            timestampString = "510802273.120656"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "403"
+            endingLineNumber = "403"
+            landmarkName = "-createOpenGLTextureFromImage:"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

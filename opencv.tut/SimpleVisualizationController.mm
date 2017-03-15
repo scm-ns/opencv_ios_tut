@@ -20,7 +20,7 @@
     if ((self = [super init]))
     {
         m_glview = view;
-        
+        angle = 0 ;
         glGenTextures(1, &m_backgroundTextureId);
         glBindTexture(GL_TEXTURE_2D, m_backgroundTextureId);
         
@@ -168,12 +168,8 @@
     
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    
 
     glLoadMatrixf(projectionMatrix.data); // how does open gl use ?
-    
-   // glLoadMatrixf(projectionMatrix.data); // how does open gl use ?
-
     // Yep it uses this to convert from the 3D model into camera iamge
     
     glMatrixMode(GL_MODELVIEW);
@@ -184,27 +180,69 @@
     //glDepthFunc(GL_LESS);
     //glDepthFunc(GL_GREATER);
     
+    [self drawRotatingCube];
+  
+    ++angle;
+    glPopMatrix();
+    glDisableClientState(GL_VERTEX_ARRAY);
+}
+
+- (void) drawRotatingCube
+{
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_NORMAL_ARRAY);
-    
-    glPushMatrix();
-    glLineWidth(3.0f);
-    
-    float lineX[] = {0,0,0,1,0,0};
-    float lineY[] = {0,0,0,0,1,0};
-    float lineZ[] = {0,0,0,0,0,1};
-    
-    const GLfloat squareVertices[] = {
-        -0.5f, -0.5f,
-        0.5f,  -0.5f,
-        -0.5f,  0.5f,
-        0.5f,   0.5f,
-    };
+   
     const GLubyte squareColors[] = {
         255, 255,   0, 255,
         0,   255, 255, 255,
-        0,     0,   0,   0,
+        255, 0,   190,   255,
         255,   0, 255, 255,
+    };
+
+    GLubyte g_color_buffer_data[12*3];
+    for(int i = 0 ; i < 12 * 3 ; ++i)
+    {
+        g_color_buffer_data[i] = squareColors[i%4*4];
+    }
+    
+    
+    GLfloat g_vertex_buffer_data[] = {
+        -1.0f,-1.0f,-1.0f, // triangle 1 : begin
+        -1.0f,-1.0f, 1.0f,
+        -1.0f, 1.0f, 1.0f, // triangle 1 : end
+        1.0f, 1.0f,-1.0f, // triangle 2 : begin
+        -1.0f,-1.0f,-1.0f,
+        -1.0f, 1.0f,-1.0f, // triangle 2 : end
+        1.0f,-1.0f, 1.0f,
+        -1.0f,-1.0f,-1.0f,
+        1.0f,-1.0f,-1.0f,
+        1.0f, 1.0f,-1.0f,
+        1.0f,-1.0f,-1.0f,
+        -1.0f,-1.0f,-1.0f,
+        -1.0f,-1.0f,-1.0f,
+        -1.0f, 1.0f, 1.0f,
+        -1.0f, 1.0f,-1.0f,
+        1.0f,-1.0f, 1.0f,
+        -1.0f,-1.0f, 1.0f,
+        -1.0f,-1.0f,-1.0f,
+        -1.0f, 1.0f, 1.0f,
+        -1.0f,-1.0f, 1.0f,
+        1.0f,-1.0f, 1.0f,
+        1.0f, 1.0f, 1.0f,
+        1.0f,-1.0f,-1.0f,
+        1.0f, 1.0f,-1.0f,
+        1.0f,-1.0f,-1.0f,
+        1.0f, 1.0f, 1.0f,
+        1.0f,-1.0f, 1.0f,
+        1.0f, 1.0f, 1.0f,
+        1.0f, 1.0f,-1.0f,
+        -1.0f, 1.0f,-1.0f,
+        1.0f, 1.0f, 1.0f,
+        -1.0f, 1.0f,-1.0f,
+        -1.0f, 1.0f, 1.0f,
+        1.0f, 1.0f, 1.0f,
+        -1.0f, 1.0f, 1.0f,
+        1.0f,-1.0f, 1.0f
     };
    
     // for each marker that has been identified do something ?
@@ -229,36 +267,27 @@
         glLoadMatrixf(reinterpret_cast<const GLfloat*>(&glMatrix.data[0]));
         
         // draw data
-        // Draw the Square
-        glVertexPointer(2, GL_FLOAT, 0, squareVertices);
+        // Draw the Cube
+        
         glEnableClientState(GL_VERTEX_ARRAY);
-        glColorPointer(4, GL_UNSIGNED_BYTE, 0, squareColors);
         glEnableClientState(GL_COLOR_ARRAY);
         
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+            glVertexPointer(3, GL_FLOAT, 0, g_vertex_buffer_data);
+
+            glColorPointer(4, GL_UNSIGNED_BYTE, 0, g_color_buffer_data);
+ 
+            float scale = 0.3; // This ensure that the lines are half the size of the square
+            glScalef(scale, scale, scale);
+        
+            glRotatef(angle, 1, 0.5, 0);
+        
+            glDrawArrays(GL_TRIANGLES, 0, 12*3);
+
         glDisableClientState(GL_COLOR_ARRAY);
-        
-        float scale = 0.5; // This ensure that the lines are half the size of the square
-        glScalef(scale, scale, scale);
-        
-        glTranslatef(0, 0, 0.1);
-        // Draw the different lines
-        glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
-        glVertexPointer(3, GL_FLOAT, 0, lineX);
-        glDrawArrays(GL_LINES, 0, 2);
-        
-        glColor4f(0.0f, 1.0f, 0.0f, 1.0f);
-        glVertexPointer(3, GL_FLOAT, 0, lineY);
-        glDrawArrays(GL_LINES, 0, 2);
-        
-        glColor4f(0.0f, 0.0f, 1.0f, 1.0f);
-        glVertexPointer(3, GL_FLOAT, 0, lineZ);
-        glDrawArrays(GL_LINES, 0, 2);
-    }
-    
-    glPopMatrix();
-    glDisableClientState(GL_VERTEX_ARRAY);
+       
+    }  
 }
+
 
 - (void)drawFrame
 {
@@ -334,8 +363,6 @@
         0,     0,   0,   0,
         255,   0, 255, 255,
     };
-   
-    
         // draw data
         glVertexPointer(2, GL_FLOAT, 0, squareVertices);
         glEnableClientState(GL_VERTEX_ARRAY);
@@ -345,8 +372,42 @@
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
         glDisableClientState(GL_COLOR_ARRAY);
     
-    
 }
+
+-(GLuint) createOpenGLTextureFromImage:(NSString *) imgNameWithType
+{
+    CGImageRef imageData = [UIImage imageNamed:imgNameWithType].CGImage;
+    if(!imageData)
+    {
+        NSLog(@"Failed to load");
+        return 1;
+    }
+
+    std::size_t width = CGImageGetWidth(imageData);
+    std::size_t height = CGImageGetHeight(imageData);
+   
+    GLubyte  * glTextureData = (GLubyte*) calloc(width * height * 4 , sizeof(GLubyte)); // 4 for RGBA
+    
+    CGContextRef textureCreationContex = CGBitmapContextCreate(glTextureData, width, height, 8, width * 4, CGImageGetColorSpace(imageData), kCGImageAlphaPremultipliedLast);
+   
+    CGContextDrawImage(textureCreationContex, CGRectMake(0, 0, width, height), imageData);
+   
+    CGContextRelease(textureCreationContex);
+    
+    GLuint textureId;
+    glGenTextures(1, &textureId);
+    glBindTexture(GL_TEXTURE_2D, textureId); // Data has been copied to the GPU
+    
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, glTextureData);
+    
+    free(glTextureData);
+    
+    return textureId;
+}
+
+
 
 @end
 

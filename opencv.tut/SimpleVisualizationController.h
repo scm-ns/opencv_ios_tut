@@ -14,6 +14,7 @@
   std::vector<Transformation> m_transformations;
   CameraCalibration m_calibration;
   CGSize m_frameSize;
+    GLfloat angle;
 }
 
 -(id) initWithGLView:(EAGLView*)view calibration:(CameraCalibration) calibration frameSize:(CGSize) size;
