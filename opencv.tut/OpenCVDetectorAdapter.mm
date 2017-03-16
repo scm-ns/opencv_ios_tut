@@ -47,15 +47,15 @@
         
         detector = new KeyPointDetector(cam);
         
-        serialQueue = dispatch_queue_create("com.opencvtut.processFrame", DISPATCH_QUEUE_PRIORITY_DEFAULT);
+     //   serialQueue = dispatch_queue_create("com.opencvtut.processFrame", DISPATCH_QUEUE_PRIORITY_DEFAULT);
     }
     return self;
 }
 
 - (void)detectFeatures:(CMSampleBufferRef)sampleBuffer
 {
-        dispatch_async(serialQueue,
-       ^{
+//        dispatch_async(serialQueue,
+ //      ^{
             // Do Conversion from Core Media to Core Video
             CVImageBufferRef imageBuffer = CMSampleBufferGetImageBuffer(sampleBuffer);
             // Lock the address
@@ -75,7 +75,7 @@
                 /*We unlock the  image buffer*/
             CVPixelBufferUnlockBaseAddress(imageBuffer,0);
                 
-       });
+      // });
         [self passTransformsBack];
     
        
@@ -87,8 +87,8 @@
         // added to a serial queue, so that after the processing is done in the earlier block (detectFeatures
         // and values are obtained.) this block is exectued which will pass the transforms to the accpetor
     
-        dispatch_async(serialQueue,
-       ^{
+      //  dispatch_async(serialQueue,
+      // ^{
            // Obtain the tranforms can pass it back to the source using acceptor delegate
            std::vector<Transformation> transforms = detector->getTransformations();
 
@@ -106,7 +106,7 @@
          
            // Pass it back to the source 
            [self.acceptor acceptTransforms:[NSArray arrayWithArray:array]];
-       });
+    //   });
 }
 
 -(SCNMatrix4) transfromToSceneKit:(Transformation) transform

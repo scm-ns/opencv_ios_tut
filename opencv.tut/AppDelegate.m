@@ -8,7 +8,7 @@
 
 #import "AppDelegate.h"
 #import "ViewController.h"
-
+#import "opencv_tut-Swift.h"
 
 @interface AppDelegate ()
 
@@ -21,7 +21,7 @@
    
     _window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     
-    _window.rootViewController = [[ViewController alloc] init];
+    _window.rootViewController = [[SceneViewController alloc] init];
   
     [_window makeKeyAndVisible];
     

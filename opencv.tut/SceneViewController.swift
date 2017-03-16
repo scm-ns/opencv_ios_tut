@@ -24,7 +24,7 @@ import SceneKit
 import AVFoundation
 import CoreLocation
 
-class SceneViewController: UIViewController , AVCaptureVideoDataOutputSampleBufferDelegate , TransformAcceptorDelegate
+class SceneViewController: UIViewController , AVCaptureVideoDataOutputSampleBufferDelegate , SCNSceneRendererDelegate , TransformAcceptorDelegate
 {
     
     private var cameraSession : AVCaptureSession?
@@ -34,7 +34,9 @@ class SceneViewController: UIViewController , AVCaptureVideoDataOutputSampleBuff
     private var featureDetector : FeatureDetectorDelegate! = nil
     
     private let scene = SCNScene()
+    private var sceneView : SCNView? = nil
     private let cameraNode = SCNNode()
+    private var itemNode : SCNNode? = nil
     
     private var nodeTransforms : [SCNMatrix4] = []
     
@@ -42,11 +44,11 @@ class SceneViewController: UIViewController , AVCaptureVideoDataOutputSampleBuff
     {
             cameraProcessQeueu =  DispatchQueue(label: "com.camera_process_queue.serial") // by default serial queue
             super.init(nibName: nil, bundle: nil)
-        
             featureDetector = OpenCVDetectorAdapter(acceptor: self)
     }
     
-    required init?(coder aDecoder: NSCoder) {
+    required init?(coder aDecoder: NSCoder)
+    {
         fatalError("init(coder:) has not been implemented")
     }
   
@@ -63,15 +65,93 @@ class SceneViewController: UIViewController , AVCaptureVideoDataOutputSampleBuff
     override func viewDidLoad()
     {
         super.viewDidLoad()
-        
         self.setupCameraCapture()
         self.setupCameraFeed()
-        DispatchQueue.global(qos: .default).async
+        self.setupSceneKitView()
+        self.positionSceneKitCamera()
+        self.loadSceneNodes()
+        self.positionSceneNodes()
+        
+        
+        self.cameraProcessQeueu.async
         {
-            self.cameraSession?.startRunning()
+                self.cameraSession?.startRunning()
         }
+    }
+
+    /*
+        desc : 
+            Called by the SCNView before appying the animations and physics for each
+            frame. Called once a frame. Update the position of the itemNodes here
+            using the transformations that are avaliable.
+ 
+    */
+    func renderer(_ renderer: SCNSceneRenderer, updateAtTime time: TimeInterval)
+    {
+            print("Rendering")
+    }
+    
+    /*
+        pre :
+        post :
+        input :
+        return :
+        state change :
         
+        desc :
+            Puts the loaded items at the correct position
+    */
+    func positionSceneNodes()
+    {
+        if let itemNode = self.itemNode
+        {
+            itemNode.position = SCNVector3(x: 0, y: 0, z: 0)
+            self.scene.rootNode.addChildNode(itemNode)
+        }
+    }
+    
+    /*
+        pre : make sure scn file to load the node is present
+        post : node will be loaded from the scn file
+        input : none
+        return : none
+        state change :
+                if success self.itemNode will have 3D item
+                else self.itemNode will be nil
+        desc : none
+    */
+    func loadSceneNodes()
+    {
+        let sceneForLoading = SCNScene(named: "art.scnassets/ship.scn")
+        let node = sceneForLoading?.rootNode.childNode(withName: "ship", recursively: true)
+        if let node = node
+        {
+            self.itemNode = node
+        }
+        else
+        {
+            print("ERROR : failed to load node")
+        }
+    }
+    
+    
+    func positionSceneKitCamera()
+    {
+        self.cameraNode.camera = SCNCamera()
         
+        // THINK : How to transform the cameraNode properly to handle the calibrations and camera coordinate transforms
+        self.cameraNode.position = SCNVector3(x: 0 , y: 0 , z:10)
+        self.scene.rootNode.addChildNode(self.cameraNode)
+    }
+    
+    func setupSceneKitView()
+    {
+            // For now take up the whole screen
+            self.sceneView = SCNView(frame: self.view.bounds)
+            self.sceneView?.scene = self.scene
+            self.sceneView?.delegate = self
+            self.sceneView?.backgroundColor = UIColor.clear
+            self.view.addSubview(self.sceneView!)
     }
     
     /*
@@ -87,7 +167,7 @@ class SceneViewController: UIViewController , AVCaptureVideoDataOutputSampleBuff
     */
     func setupCameraCapture() 
     {
-            DispatchQueue.global(qos: .default).async
+            self.cameraProcessQeueu.async
             {
                 let backCamera = AVCaptureDevice.defaultDevice(withDeviceType: .builtInWideAngleCamera, mediaType: AVMediaTypeVideo, position: .back)
                 
@@ -147,6 +227,8 @@ class SceneViewController: UIViewController , AVCaptureVideoDataOutputSampleBuff
                 }
                
                 videoOutput.connection(withMediaType: AVMediaTypeVideo)
+               
+                self.setupCameraFeed()
                 
         }
         
@@ -170,8 +252,6 @@ class SceneViewController: UIViewController , AVCaptureVideoDataOutputSampleBuff
                 return
         }
        
-        DispatchQueue.main.async
-        {
            self.cameraLayer = AVCaptureVideoPreviewLayer(session: self.cameraSession) ?? nil
             
            guard self.cameraLayer != nil else
@@ -184,7 +264,6 @@ class SceneViewController: UIViewController , AVCaptureVideoDataOutputSampleBuff
            self.cameraLayer?.videoGravity = AVLayerVideoGravityResizeAspectFill
            self.cameraLayer?.frame = self.view.bounds
            self.view.layer.insertSublayer(self.cameraLayer!, at: 0)
-        }
     }
     
     /*
