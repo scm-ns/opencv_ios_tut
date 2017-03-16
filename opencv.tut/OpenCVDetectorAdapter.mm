@@ -6,7 +6,7 @@
 //  Copyright © 2017 scm197. All rights reserved.
 //
 
-#import "OpenCVAdapter.h"
+#import "OpenCVDetectorAdapter.h"
 #import <opencv2/core.hpp>
 #import "KeyPointDetector.hpp"
 
@@ -30,7 +30,7 @@
 
 
 
-@implementation OpenCVAdapter
+@implementation OpenCVDetectorAdapter
 {
     KeyPointDetector * detector;
     dispatch_queue_t serialQueue;
@@ -84,11 +84,15 @@
 
 -(void)passTransformsBack
 {
+        // added to a serial queue, so that after the processing is done in the earlier block (detectFeatures
+        // and values are obtained.) this block is exectued which will pass the transforms to the accpetor
+    
         dispatch_async(serialQueue,
        ^{
            // Obtain the tranforms can pass it back to the source using acceptor delegate
            std::vector<Transformation> transforms = detector->getTransformations();
 
+           NSLog(@"Size : %lu" , transforms.size());
             // Convert the tranforms into SCNMatrix4 array
            
            NSMutableArray* array = [[NSMutableArray alloc] init];

@@ -39,7 +39,7 @@
 
 
 // Convert to protcol for better design
-@interface OpenCVAdapter : NSObject <FeatureDetectorDelegate>
+@interface OpenCVDetectorAdapter : NSObject <FeatureDetectorDelegate>
     
 @property (nonatomic,weak) id<TransformAcceptorDelegate> acceptor;
 
