@@ -14,7 +14,6 @@
         On top of the camera feed add 3D scene
         Recognize markers from the camera feed and apply the transform to 3D objects
  
- 
     Details :
         Show the camera using the av preview layer
  
@@ -32,17 +31,19 @@ class SceneViewController: UIViewController , AVCaptureVideoDataOutputSampleBuff
     private var cameraLayer : AVCaptureVideoPreviewLayer?
     private let cameraProcessQeueu : DispatchQueue
 
-    private var featureDelector : FeatureDetectorDelegate? = nil
+    private var featureDetector : FeatureDetectorDelegate! = nil
     
     private let scene = SCNScene()
     private let cameraNode = SCNNode()
+    
+    private var nodeTransforms : [SCNMatrix4] = []
     
     init()
     {
             cameraProcessQeueu =  DispatchQueue(label: "com.camera_process_queue.serial") // by default serial queue
             super.init(nibName: nil, bundle: nil)
         
-            featureDelector = OpenCVAdapter(acceptor: self)
+            featureDetector = OpenCVDetectorAdapter(acceptor: self)
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -211,40 +212,44 @@ class SceneViewController: UIViewController , AVCaptureVideoDataOutputSampleBuff
     */
     func captureOutput(_ captureOutput: AVCaptureOutput!, didOutputSampleBuffer sampleBuffer: CMSampleBuffer!, from connection: AVCaptureConnection!)
     {
-        
-        featureDelector?.detectFeatures(sampleBuffer)
-        
-        /*
-        let imageBuffer :  CVImageBuffer = CMSampleBufferGetImageBuffer(sampleBuffer)!;
-        
-        // Lock buffer
-        CVPixelBufferLockBaseAddress(imageBuffer,CVPixelBufferLockFlags(rawValue: 0));
-
-        // Create a cv::Mat from the buffer
-
-        //cv::Mat bgraMat(frame.height, frame.width, CV_8UC4, frame.data, frame.stride);
-
- 
-        uint8_t *baseAddress = (uint8_t *)CVPixelBufferGetBaseAddress(imageBuffer);
-        size_t width = CVPixelBufferGetWidth(imageBuffer);
-        size_t height = CVPixelBufferGetHeight(imageBuffer);
-        size_t stride = CVPixelBufferGetBytesPerRow(imageBuffer);
-       
-        // Convert the item directly into a  cv mat and do processing on it.
-           // Data point to the base adderess.
-            // See the convertions.
-        BGRAVideoFrame frame = {width, height, stride, baseAddress};
-        [delegate frameReady:frame];
-        
-    	/*We unlock the  image buffer*/
-    	CVPixelBufferUnlockBaseAddress(imageBuffer,0);
-    } 
-        */
+        // Process each frame. Reduce this to lower numbers
+        featureDetector.detectFeatures(sampleBuffer)
     }
-    
-    func acceptTransforms(_ transforms: [Any]!) {
+   
+    /*
+        pre : feature has to be detected before the transforms can be obtained.
+        post :
+        input : an array of SCNMatrix4 stored as NSValue
+        return : none
+        state change : get the transforms to be applied to the nodes in the scene
+        desc :
+            called by the featureDetector when the features are obtained and the transforms are passed back
+            into the acceptor
+            We just store the transforms, nothing is done with it.
+    */
+    func acceptTransforms(_ transforms: [Any]!)
+    {
+        // get rid of old transforms
+        nodeTransforms = []
         
-            // Extract the rotation and translation components and apply it to the models 
+        // Extract the rotation and translation components and apply it to the models
+        for transform in transforms
+        {
+            let value = transform as? NSValue
+            if let value = value
+            {
+                let mat = value as? SCNMatrix4
+                if let mat = mat
+                {
+                        nodeTransforms.append(mat)
+                }
+            }
+        }
+        
+        if nodeTransforms.isEmpty
+        {
+           print("Failure to obtain transforms")
+        }
     }
    
 }
