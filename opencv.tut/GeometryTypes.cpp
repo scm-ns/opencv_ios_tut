@@ -1,4 +1,5 @@
 
+// Adopted from MasterOpenCV With practical examples book.
 #include "GeometryTypes.hpp"
 
 Matrix44 Matrix44::getTransposed() const

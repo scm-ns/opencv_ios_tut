@@ -1,5 +1,6 @@
-#include "CameraCalibration.hpp"
 
+// Adopted from MasterOpenCV With practical examples book.
+#include "CameraCalibration.hpp"
 
 CameraCalibration::CameraCalibration()
 {

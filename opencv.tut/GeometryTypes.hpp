@@ -1,4 +1,6 @@
 
+
+// Adopted from MasterOpenCV With practical examples book.
 #ifndef Example_MarkerBasedAR_GeometryTypes_hpp
 #define Example_MarkerBasedAR_GeometryTypes_hpp
 

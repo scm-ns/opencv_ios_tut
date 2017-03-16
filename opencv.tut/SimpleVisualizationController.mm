@@ -166,7 +166,8 @@
     Matrix44 projectionMatrix;
     [self buildProjectionMatrix:m_calibration.getIntrinsic():m_frameSize.width :m_frameSize.height :projectionMatrix];
     
-    glMatrixMode(GL_PROJECTION);
+    glMatrixMode(GL_PROJECTION); // This should refer to the camera projection. Which moves from the model coor to
+    // the camera coordinates
     glLoadIdentity();
 
     glLoadMatrixf(projectionMatrix.data); // how does open gl use ?

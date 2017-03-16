@@ -22,7 +22,6 @@
 }
 @end
 
-
 @implementation ViewController
 @synthesize glView;
 
@@ -152,7 +151,6 @@
     std::vector<Transformation> trans = markerDetector->getTransformations();
     
     NSLog(@"Size : %lu" , trans.size());
-  
     
     
     // When it's done we query rendering from main thread

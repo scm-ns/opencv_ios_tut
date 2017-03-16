@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3660FEB11E79DD25003B4907 /* SceneViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3660FEB01E79DD25003B4907 /* SceneViewController.swift */; };
+		3660FED31E79EE92003B4907 /* art.scnassets in Resources */ = {isa = PBXBuildFile; fileRef = 3660FED21E79EE92003B4907 /* art.scnassets */; };
+		3660FED61E7A77FA003B4907 /* OpenCVDetectorAdapter.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3660FED51E7A77FA003B4907 /* OpenCVDetectorAdapter.mm */; };
 		36793B971E68E44C00A35A93 /* EAGLView.m in Sources */ = {isa = PBXBuildFile; fileRef = 36793B941E68E44C00A35A93 /* EAGLView.m */; };
 		36793B981E68E44C00A35A93 /* SimpleVisualizationController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 36793B961E68E44C00A35A93 /* SimpleVisualizationController.mm */; };
 		36939DA11E5E6DC400F7E160 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 36939DA01E5E6DC400F7E160 /* main.m */; };
@@ -29,6 +32,11 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		3660FEAF1E79DD25003B4907 /* opencv.tut-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "opencv.tut-Bridging-Header.h"; sourceTree = "<group>"; };
+		3660FEB01E79DD25003B4907 /* SceneViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SceneViewController.swift; sourceTree = "<group>"; };
+		3660FED21E79EE92003B4907 /* art.scnassets */ = {isa = PBXFileReference; lastKnownFileType = wrapper.scnassets; path = art.scnassets; sourceTree = "<group>"; };
+		3660FED41E7A77FA003B4907 /* OpenCVDetectorAdapter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OpenCVDetectorAdapter.h; sourceTree = "<group>"; };
+		3660FED51E7A77FA003B4907 /* OpenCVDetectorAdapter.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = OpenCVDetectorAdapter.mm; sourceTree = "<group>"; };
 		36793B931E68E44C00A35A93 /* EAGLView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EAGLView.h; sourceTree = "<group>"; };
 		36793B941E68E44C00A35A93 /* EAGLView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EAGLView.m; sourceTree = "<group>"; };
 		36793B951E68E44C00A35A93 /* SimpleVisualizationController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SimpleVisualizationController.h; sourceTree = "<group>"; };
@@ -105,6 +113,11 @@
 				36939DA31E5E6DC400F7E160 /* AppDelegate.m */,
 				36939DA51E5E6DC400F7E160 /* ViewController.h */,
 				36939DA61E5E6DC400F7E160 /* ViewController.mm */,
+				3660FEB01E79DD25003B4907 /* SceneViewController.swift */,
+				3660FED41E7A77FA003B4907 /* OpenCVDetectorAdapter.h */,
+				3660FED51E7A77FA003B4907 /* OpenCVDetectorAdapter.mm */,
+				3660FEAF1E79DD25003B4907 /* opencv.tut-Bridging-Header.h */,
+				3660FED21E79EE92003B4907 /* art.scnassets */,
 				36939DAB1E5E6DC400F7E160 /* Assets.xcassets */,
 				36939DB01E5E6DC500F7E160 /* Info.plist */,
 				36939D9F1E5E6DC400F7E160 /* Supporting Files */,
@@ -187,6 +200,7 @@
 					36939D9B1E5E6DC400F7E160 = {
 						CreatedOnToolsVersion = 8.2.1;
 						DevelopmentTeam = B8389ZXE5K;
+						LastSwiftMigration = 0820;
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -215,6 +229,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				36939DC41E5E6DC500F7E160 /* opencv2.framework in Resources */,
+				3660FED31E79EE92003B4907 /* art.scnassets in Resources */,
 				36939DAC1E5E6DC400F7E160 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -230,11 +245,13 @@
 				36939DA71E5E6DC400F7E160 /* ViewController.mm in Sources */,
 				36939DA41E5E6DC400F7E160 /* AppDelegate.m in Sources */,
 				36E9E9E21E667FA900636730 /* CameraCalibration.cpp in Sources */,
+				3660FEB11E79DD25003B4907 /* SceneViewController.swift in Sources */,
 				36793B981E68E44C00A35A93 /* SimpleVisualizationController.mm in Sources */,
 				36E9E9DF1E667F4F00636730 /* GeometryTypes.cpp in Sources */,
 				36D137331E5E181900B7F1FE /* UIImage+OpenCV.mm in Sources */,
 				36793B971E68E44C00A35A93 /* EAGLView.m in Sources */,
 				36939DA11E5E6DC400F7E160 /* main.m in Sources */,
+				3660FED61E7A77FA003B4907 /* OpenCVDetectorAdapter.mm in Sources */,
 				36E9E9DB1E6668BC00636730 /* Marker.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -266,6 +283,7 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEFINES_MODULE = YES;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
@@ -286,6 +304,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 10.2;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = opencv.tut;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				USER_HEADER_SEARCH_PATHS = "/Users/scm197/viacom/ar_project/libs/**";
@@ -316,6 +335,7 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEFINES_MODULE = YES;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
@@ -329,6 +349,7 @@
 				HEADER_SEARCH_PATHS = /Users/scm197/viacom/ar_project/libs/opencv2.framework/Headers;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.2;
 				MTL_ENABLE_DEBUG_INFO = NO;
+				PRODUCT_NAME = opencv.tut;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				USER_HEADER_SEARCH_PATHS = "/Users/scm197/viacom/ar_project/libs/**";
@@ -341,6 +362,8 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
+				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = B8389ZXE5K;
 				FRAMEWORK_SEARCH_PATHS = /Users/scm197/viacom/ar_project/libs;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -349,6 +372,9 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "scm197.opencv-tut";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "opencv.tut/opencv.tut-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 3.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				USER_HEADER_SEARCH_PATHS = /Users/scm197/viacom/ar_project/libs;
 			};
@@ -359,6 +385,8 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
+				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = B8389ZXE5K;
 				FRAMEWORK_SEARCH_PATHS = /Users/scm197/viacom/ar_project/libs;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -367,6 +395,8 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "scm197.opencv-tut";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "opencv.tut/opencv.tut-Bridging-Header.h";
+				SWIFT_VERSION = 3.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				USER_HEADER_SEARCH_PATHS = /Users/scm197/viacom/ar_project/libs;
 			};

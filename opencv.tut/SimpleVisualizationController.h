@@ -1,4 +1,6 @@
 
+// Adopted from MasterOpenCV With practical examples book.
+
 #import <Foundation/Foundation.h>
 
 ////////////////////////////////////////////////////////////////////

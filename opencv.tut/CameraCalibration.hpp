@@ -1,4 +1,5 @@
 
+// Adopted from MasterOpenCV With practical examples book.
 #ifndef Example_MarkerBasedAR_CameraCalibration_hpp
 #define Example_MarkerBasedAR_CameraCalibration_hpp
 
