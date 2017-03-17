@@ -87,12 +87,22 @@ class SceneViewController: UIViewController , AVCaptureVideoDataOutputSampleBuff
     */
     func renderer(_ renderer: SCNSceneRenderer, updateAtTime time: TimeInterval)
     {
-        let count : Float = 0.01;
-        if let item = self.itemNode
+        var itemCopy : SCNNode?
+      
+        guard let item = self.itemNode else
         {
-            item.position = SCNVector3(x: item.position.x , y: item.position.y + count, z: item.position.z)
+           return
         }
-            print("Rendering")
+        
+        for transform in self.nodeTransforms
+        {
+            itemCopy = item.clone()
+            itemCopy?.transform = transform
+            self.scene.rootNode.addChildNode(itemCopy!) // where to remove
+            print("draw item ")
+        }
+        
+        print("Rendering")
     }
     
     /*
@@ -111,6 +121,9 @@ class SceneViewController: UIViewController , AVCaptureVideoDataOutputSampleBuff
         {
             itemNode.position = SCNVector3(x: 0, y: 0, z: 0)
             self.scene.rootNode.addChildNode(itemNode)
+            
+            //self.scene.rootNode.addChildNode(item)
+            
         }
     }
     
@@ -144,6 +157,8 @@ class SceneViewController: UIViewController , AVCaptureVideoDataOutputSampleBuff
         self.cameraNode.camera = SCNCamera()
         
         // THINK : How to transform the cameraNode properly to handle the calibrations and camera coordinate transforms
+        print(self.cameraNode.camera?.projectionTransform ?? "WE")
+
         self.cameraNode.position = SCNVector3(x: 0 , y: 0 , z:10)
         self.scene.rootNode.addChildNode(self.cameraNode)
     }
@@ -337,3 +352,76 @@ class SceneViewController: UIViewController , AVCaptureVideoDataOutputSampleBuff
     }
    
 }
+
+
+/*
+    Discussion about the SceneKit camera and model setup.
+    
+    OpenCV allows us to find the pose of the camera. 
+            > Which is the transformations that have to be made to a camera such that the 2D model 
+              appears in a specific way in the 3D space. 
+                    So in the case of markers. We have a 2D model of what they look like. Meaning their height width and the 
+                    positions of the edges of the marker in a Model Coordinate system.
+                    Open CV finds and compares this 2D model's position with the position of the markers ( edges ) in the 3D space
+                    and finds the transformations that have to be made to the camera (rot , translation), such that the 2D item 
+                    appears as such in the 3D space
+    
+                    Now if we invert the transformations that have to be applied to the camera, we get the transformations that
+                    have to be applied to an object in 3D Model space such that they appear in right position in the Camera Coordinate system
+
+ 
+ 
+    Then in OpenGL we set a projection Matrix, which determines how to do the transform from a 3D camera coordinate to a 2D camera Coordinate. The prespective projection using the frustrum. 
+            This is done by setting the PROJECTION Matrix in OpenGL
+ 
+    But using the transforms obtained using opencv which can be used to do a conversion between 2D model space to 3D model space.
+    (
+        We know that the marker is a 3D item, but for finding that correspondence, we have to use a 2D model space.
+        The transform obtained by openCV can do a conversion between 3D model space to 3D camera coordinate space. 
+                This is the high level description, I don't know how this is being done.
+    )
+ 
+    We tranfrom from the 3D model coor to 3D camera coor.
+        This is done by setting the MODELVIEW Matrix in OpenGL. Which applies the transform form 3d model space to 3d camera coor.
+ 
+    Then Finally the prespective projection does the conversion from the 3D camera coor to the 2D camera coor.
+            So all the 3D model items transformed and placed in the 3D camera coor will be converted to cooresponding
+            2D camera coor. 
+
+
+    HOW TO CONVERT THIS TO SCENE KIT
+        The parameters that I can control are
+ 
+            1) the prespective tranform of the camera node
+                [ Converts from 3D camera coor to 2D camera coor ]
+ 
+            2) the transform of the nodes that are positioned in the camera coor
+ 
+ 
+        How to set : 
+ 
+            1)  
+                There is an internal prepective transform of the camera node. This is USELESS as it only converts from the
+                articial 3D camera coor to the 2D camera coor. It does not correspond to prespective tranform that has to
+                done on every model in the real 3D camera coor to the real 2D camera coor.
+ 
+                    May be a better term for the artificial camera coor is scene coor.
+
+                So how to set this. Not sure. If I understand it correctly, then this should correspond to the 
+                PROJECTION Matrix that is set in OpenGL.
+ 
+                Issues here are : 
+                            a) How to move the data from the cpp classes to the Swift classes
+                            b) The SceneKit represent Matrix in a different form that the one used in OPENGL/CV
+                                    Essentially this is just a transform
+ 
+           2)
+                Again if I am understanding the pipeline correctly. I will just have to set the transform obtained by
+                open cv ( more presicely its inverse ( The transformed are stored in the inverted form already ))
+                to the transform of the each of the nodes.
+            
+                Isssues here are :
+                            a) The movement of the data
+                            b) The inverse relationship between the data formats
+ */
+
