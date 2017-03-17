@@ -20,6 +20,11 @@
     -(void)detectFeatures:(CMSampleBufferRef) sampleBuffer;
 @end
 
+@protocol PrespectiveProjBuilder
+    -(void) setScreenProperties:(int)width height:(int)height;
+    -(SCNMatrix4) getPrespectiveSCNMatrix4;
+@end
+
 /*
     Purpose : 
         After FeatureDelectorDelegate is passed the sample buffer.
@@ -39,10 +44,13 @@
 
 
 // Convert to protcol for better design
-@interface OpenCVDetectorAdapter : NSObject <FeatureDetectorDelegate>
+@interface OpenCVDetectorAdapter : NSObject <FeatureDetectorDelegate , PrespectiveProjBuilder>
     
 @property (nonatomic,weak) id<TransformAcceptorDelegate> acceptor;
 
 - (instancetype)initWithAcceptor: (id<TransformAcceptorDelegate>) acceptorDelegate;
+
+-(void) setScreenProperties:(int)width height:(int)height;
+-(SCNMatrix4) getPrespectiveSCNMatrix4;
 
 @end

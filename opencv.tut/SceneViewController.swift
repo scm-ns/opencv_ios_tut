@@ -31,7 +31,7 @@ class SceneViewController: UIViewController , AVCaptureVideoDataOutputSampleBuff
     private var cameraLayer : AVCaptureVideoPreviewLayer?
     private let cameraProcessQeueu : DispatchQueue
 
-    private var featureDetector : FeatureDetectorDelegate! = nil
+    private var featureDetector : (FeatureDetectorDelegate & PrespectiveProjBuilder)! = nil
     
     private let scene = SCNScene()
     private var sceneView : SCNView? = nil
@@ -69,8 +69,9 @@ class SceneViewController: UIViewController , AVCaptureVideoDataOutputSampleBuff
         self.setupSceneKitView()
         self.positionSceneKitCamera()
         self.loadSceneNodes()
-        self.positionSceneNodes()
+//        self.positionSceneNodes()
         
+        self.setupPrespectiveTranformInSceneKit()()
         
         self.cameraProcessQeueu.async
         {
@@ -78,6 +79,30 @@ class SceneViewController: UIViewController , AVCaptureVideoDataOutputSampleBuff
         }
     }
 
+    /*
+        pre : The camera node should exist. The Scene and view should be set up.
+              And the scnview size should be setup
+        post : SceneKit is not able to convert from the 3D camera coor to the 2D camera coor in the right manner. 
+                    Meaning that the porjection of the real camera and this artifical camera is lined up ?
+     
+        state change : 
+        desc : 
+                But what does it actually do ?
+                    It positions the camera in camera coor space properly such that the tranforms applied to the model by
+                    open cv to convert the model into camera coor is respected. That is, the models now become obserable
+                    by the camera
+                    THINK : Make this better
+    */
+    func setupPrespectiveTranformInSceneKit()
+    {
+            // Set properties for forming the projection matrix
+            self.featureDetector.setScreenProperties(Int32(self.view.bounds.width), height: Int32(self.view.bounds.height))
+        
+            let prespectiveTransform = self.featureDetector.getPrespectiveSCNMatrix4()
+            self.cameraNode.camera?.projectionTransform = prespectiveTransform
+    }
+    
+    
     /*
         desc : 
             Called by the SCNView before appying the animations and physics for each

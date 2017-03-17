@@ -42,6 +42,33 @@ Matrix44 Matrix44::getInvertedRT() const
   return t;
 }
 
+Matrix33 Matrix44::getRot() const
+{
+    Matrix33 ret33;
+    
+    for(int row = 0 ; row < 3 ; ++row)
+    {
+        for(int col = 0 ; col < 3 ; ++col)
+        {
+            ret33.mat[row][col] = mat[row][col]; // Get the first 3x3 matrix from the 4x4 matrix . Starting at top left
+        }
+    }
+   
+    return ret33;
+}
+
+Vector3 Matrix44::getTran() const
+{
+    Vector3 ret3;
+    
+    for(int idx = 0 ; idx < 3 ; ++idx)
+    {
+        ret3.data[idx] = mat[idx][3]; // get the first 3 elements of the last column
+    }
+    return ret3;
+}
+
+
 Matrix33 Matrix33::identity()
 {
   Matrix33 eye;

@@ -4,19 +4,6 @@
 #ifndef Example_MarkerBasedAR_GeometryTypes_hpp
 #define Example_MarkerBasedAR_GeometryTypes_hpp
 
-struct Matrix44
-{
-  union
-  {
-    float data[16];
-    float mat[4][4];
-  };
-  
-  Matrix44 getTransposed() const;
-  Matrix44 getInvertedRT() const;
-  static Matrix44 identity();
-};
-
 struct Matrix33
 {
   union
@@ -42,6 +29,24 @@ struct Vector3
   Vector3 operator-() const;
 };
 
+struct Matrix44
+{
+  union
+  {
+    float data[16];
+    float mat[4][4];
+  };
+  
+  Matrix44 getTransposed() const;
+  Matrix44 getInvertedRT() const;
+  Matrix33 getRot() const;
+  Vector3 getTran() const;
+  static Matrix44 identity();
+    
+    
+};
+
+
 struct Transformation
 {
   Transformation();
@@ -60,5 +65,7 @@ private:
   Matrix33 m_rotation;
   Vector3  m_translation;
 };
+
+
 
 #endif
