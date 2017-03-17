@@ -47,16 +47,14 @@
         
         detector = new KeyPointDetector(cam);
         
-     //   serialQueue = dispatch_queue_create("com.opencvtut.processFrame", DISPATCH_QUEUE_PRIORITY_DEFAULT);
+        serialQueue = dispatch_queue_create("com.opencvtut.processFrame", DISPATCH_QUEUE_PRIORITY_DEFAULT);
     }
     return self;
 }
 
 - (void)detectFeatures:(CMSampleBufferRef)sampleBuffer
 {
-//        dispatch_async(serialQueue,
- //      ^{
-            // Do Conversion from Core Media to Core Video
+           // Do Conversion from Core Media to Core Video
             CVImageBufferRef imageBuffer = CMSampleBufferGetImageBuffer(sampleBuffer);
             // Lock the address
             CVPixelBufferLockBaseAddress(imageBuffer,0);
@@ -65,20 +63,18 @@
             size_t width = CVPixelBufferGetWidth(imageBuffer);
             size_t height = CVPixelBufferGetHeight(imageBuffer);
             size_t stride = CVPixelBufferGetBytesPerRow(imageBuffer);
-
             // create a cv::Mat from the frame buffer
             cv::Mat bgraMat(height, width , CV_8UC4 , baseAddress , stride);
-
-            // Detect the different transforms . THINK : Make the method asyn or something like that ? 
-            detector->processFrame(bgraMat);
-           
-                /*We unlock the  image buffer*/
-            CVPixelBufferUnlockBaseAddress(imageBuffer,0);
-                
-      // });
-        [self passTransformsBack];
     
-       
+            CVPixelBufferUnlockBaseAddress(imageBuffer,0);
+    
+            dispatch_async(serialQueue,
+            ^{
+                // Detect the different transforms . THINK : Make the method asyn or something like that ?
+                detector->processFrame(bgraMat);
+               
+                [self passTransformsBack];
+             });
     
 }
 
