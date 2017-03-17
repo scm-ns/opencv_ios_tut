@@ -60,7 +60,6 @@ class SceneViewController: UIViewController , AVCaptureVideoDataOutputSampleBuff
         state change : none
         desc : 
             default behavior + Shows the camera feed
- 
     */
     override func viewDidLoad()
     {
@@ -88,6 +87,11 @@ class SceneViewController: UIViewController , AVCaptureVideoDataOutputSampleBuff
     */
     func renderer(_ renderer: SCNSceneRenderer, updateAtTime time: TimeInterval)
     {
+        let count : Float = 0.01;
+        if let item = self.itemNode
+        {
+            item.position = SCNVector3(x: item.position.x , y: item.position.y + count, z: item.position.z)
+        }
             print("Rendering")
     }
     
@@ -150,6 +154,7 @@ class SceneViewController: UIViewController , AVCaptureVideoDataOutputSampleBuff
             self.sceneView = SCNView(frame: self.view.bounds)
             self.sceneView?.scene = self.scene
             self.sceneView?.delegate = self
+            self.sceneView?.play(nil)
             self.sceneView?.backgroundColor = UIColor.clear
             self.view.addSubview(self.sceneView!)
     }
