@@ -17,6 +17,18 @@
     Details :
         Show the camera using the av preview layer
  
+    Possible Issues  + Current state:
+        I have setup scene kit so that it respects the 3D camera coordinate space. Which is defined by the
+        Camera calibration and used by open cv to place the marker in the right location in the space.
+            This is done by
+                    1) getting the prespective transform and applying it to the camera node
+                    2) Applying the transform of the model to be the same as the transform of the marker.
+ 
+ 
+        Issues : 
+                    1) Inverse relation between the transforms used by OPENCV/GL and Scene Kit.
+                        Am I doing this conversion properly ?
+                    2) Error in understanding of what is happening ?
  */
 
 import UIKit
@@ -71,7 +83,6 @@ class SceneViewController: UIViewController , AVCaptureVideoDataOutputSampleBuff
         self.loadSceneNodes()
 //        self.positionSceneNodes()
         
-        self.setupPrespectiveTranformInSceneKit()()
         
         self.cameraProcessQeueu.async
         {
@@ -108,6 +119,9 @@ class SceneViewController: UIViewController , AVCaptureVideoDataOutputSampleBuff
             Called by the SCNView before appying the animations and physics for each
             frame. Called once a frame. Update the position of the itemNodes here
             using the transformations that are avaliable.
+            
+            During each step of the render loop the markers transforms obtained by using opencv
+            is used to draw the models.
  
     */
     func renderer(_ renderer: SCNSceneRenderer, updateAtTime time: TimeInterval)
@@ -118,16 +132,28 @@ class SceneViewController: UIViewController , AVCaptureVideoDataOutputSampleBuff
         {
            return
         }
-        
-        for transform in self.nodeTransforms
+       
+        // Remove all the previously drawn items
+        // Inefficient work on
+        for node in self.scene.rootNode.childNodes
         {
-            itemCopy = item.clone()
-            itemCopy?.transform = transform
-            self.scene.rootNode.addChildNode(itemCopy!) // where to remove
-            print("draw item ")
+            node.removeFromParentNode()
         }
         
-        print("Rendering")
+        for transform in self.nodeTransforms // Is items have been identified. Then place an object on top of it.
+        {
+            itemCopy = item.clone() // Copy the 3D model so that we can have mulitple models if there are multiple makers
+           
+            // Position the model in the right location in the 3D camera coor
+            itemCopy?.transform = transform
+            //print(transform)
+            
+            // TO DO : Remove the nodes from scene, else system slows down due to a large number of nodes
+            self.scene.rootNode.addChildNode(itemCopy!) // where to remove
+            //print("draw item ")
+        }
+        
+        //print("Rendering")
     }
     
     /*
@@ -146,9 +172,6 @@ class SceneViewController: UIViewController , AVCaptureVideoDataOutputSampleBuff
         {
             itemNode.position = SCNVector3(x: 0, y: 0, z: 0)
             self.scene.rootNode.addChildNode(itemNode)
-            
-            //self.scene.rootNode.addChildNode(item)
-            
         }
     }
     
@@ -184,8 +207,10 @@ class SceneViewController: UIViewController , AVCaptureVideoDataOutputSampleBuff
         // THINK : How to transform the cameraNode properly to handle the calibrations and camera coordinate transforms
         print(self.cameraNode.camera?.projectionTransform ?? "WE")
 
-        self.cameraNode.position = SCNVector3(x: 0 , y: 0 , z:10)
+        self.setupPrespectiveTranformInSceneKit()
         self.scene.rootNode.addChildNode(self.cameraNode)
+        
+        print(self.cameraNode.camera?.projectionTransform ?? "WE")
     }
     
     func setupSceneKitView()

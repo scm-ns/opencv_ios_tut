@@ -29,14 +29,13 @@
 #import <opencv2/opencv.hpp>
 
 
-
 @implementation OpenCVDetectorAdapter
 {
-    KeyPointDetector * _detector;
+    KeyPointDetector* _detector;
     dispatch_queue_t serialQueue;
     int _screenWidth;
     int _screenHeight;
-    CameraCalibration * _calibraion;
+    CameraCalibration* _calibraion;
 }
 
 - (instancetype)initWithAcceptor:(id<TransformAcceptorDelegate>) acceptorDelegate
@@ -46,8 +45,7 @@
     {
         self.acceptor = acceptorDelegate;
         
-        
-        // Update this with the correct screen size
+       // Update this with the correct screen size
         
        // detector = new KeyPointDetector(cam);
         _detector = nil;
@@ -138,9 +136,9 @@
     mat.m22 = rot.mat[1][1];
     mat.m23 = rot.mat[2][1];
     
-    mat.m31 = rot.mat[0][1];
-    mat.m32 = rot.mat[1][1];
-    mat.m33 = rot.mat[2][1];
+    mat.m31 = rot.mat[0][2];
+    mat.m32 = rot.mat[1][2];
+    mat.m33 = rot.mat[2][2];
    
     //Copy the translation rows
     mat.m41 = tran.data[0];
@@ -164,6 +162,8 @@
  */
 -(SCNMatrix4) getPrespectiveSCNMatrix4
 {
+    
+    std::cout << "Set up calibration with = Width : " << _screenWidth << " Height :" << _screenHeight << std::endl;
     Matrix44* projMat = [self buildProjectionMatrix:_calibraion->getIntrinsic() width:_screenWidth height:_screenHeight];
     
     // Now convert the projMat into a tranform an use the utility func to convert into a SCNMatrix4
