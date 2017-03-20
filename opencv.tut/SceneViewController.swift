@@ -140,12 +140,15 @@ class SceneViewController: UIViewController , AVCaptureVideoDataOutputSampleBuff
             node.removeFromParentNode()
         }
         
-        for transform in self.nodeTransforms // Is items have been identified. Then place an object on top of it.
+        for transform in self.nodeTransforms // If items have been identified. Then place an object on top of it.
         {
             itemCopy = item.clone() // Copy the 3D model so that we can have mulitple models if there are multiple makers
            
             // Position the model in the right location in the 3D camera coor
             itemCopy?.transform = transform
+            
+            itemCopy?.scale = SCNVector3(x : 0.1 , y : 0.1 , z : 0.1);
+            
             //print(transform)
             
             // TO DO : Remove the nodes from scene, else system slows down due to a large number of nodes
