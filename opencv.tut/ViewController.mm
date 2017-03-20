@@ -31,7 +31,7 @@
     {
         _imageView = [[UIImageView alloc] init];
         videoCamera = [self setupVideoCameraWithView:_imageView];
-        camCal = new CameraCalibration(1350,1200 , 150, 200);
+        camCal = new CameraCalibration(1350 , 1200 , 150, 200);
         
         
         markerDetector = new KeyPointDetector(*(camCal));

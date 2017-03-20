@@ -354,7 +354,7 @@ void KeyPointDetector::estimatePosition(std::vector<Marker>& detectedMarkers)
         cv::Mat raux,taux;
         
        
-        // What this gives us, is what rot and trans has to be applied to the 3d model to convert it into 
+        // What this gives us, is the rot and trans has to be applied to the 3d model to convert it into 
         // world coordinates so that the corresponsding 3d image is to be formed.
         // It can also be though of as the transformations that have to be made to the camera
         // so that the corresponding 2d image of the 3d object is formed...

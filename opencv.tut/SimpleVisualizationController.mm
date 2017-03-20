@@ -259,6 +259,18 @@
     
     // There are two places where all of this could go wrong.
     
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    
+    // So what is the purpose of the model view matrix.
+    // It is clearly drawing in the cameraCoordinate space.
+    
+    // So the precpective projection tells how to convert from the 3D camera coordinates into the 2D coordinates
+   
+    // And the model view tells open gl what transformations to do to the model coordinate system.
+    // The model coordinate space is NDC . -1 to +1 in all directions
+    // So setting the matrix here, tells open gl how to convert from the  model space into the camera coordinate space.
+    
     for (size_t transformationIndex=0; transformationIndex<m_transformations.size(); transformationIndex++)
     {
         const Transformation& transformation = m_transformations[transformationIndex];
