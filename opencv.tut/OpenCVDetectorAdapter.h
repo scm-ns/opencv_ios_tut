@@ -47,8 +47,9 @@
 @interface OpenCVDetectorAdapter : NSObject <FeatureDetectorDelegate , PrespectiveProjBuilder>
     
 @property (nonatomic,weak) id<TransformAcceptorDelegate> acceptor;
+@property (nonatomic,weak) AVCaptureDeviceInput * cameraInput;
 
-- (instancetype)initWithAcceptor: (id<TransformAcceptorDelegate>) acceptorDelegate;
+- (instancetype)initWithAcceptor: (id<TransformAcceptorDelegate>) acceptorDelegate cameraInput:(AVCaptureDeviceInput* ) camera;
 
 -(void) setScreenProperties:(int)width height:(int)height;
 -(SCNMatrix4) getPrespectiveSCNMatrix4;

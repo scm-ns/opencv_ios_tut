@@ -38,17 +38,15 @@
     CameraCalibration* _calibraion;
 }
 
-- (instancetype)initWithAcceptor:(id<TransformAcceptorDelegate>) acceptorDelegate
+- (instancetype)initWithAcceptor: (id<TransformAcceptorDelegate>) acceptorDelegate cameraInput:(AVCaptureDeviceInput* ) camera
 {
     self = [super init];
     if (self)
     {
         self.acceptor = acceptorDelegate;
         
-       // Update this with the correct screen size
-        
-       // detector = new KeyPointDetector(cam);
         _detector = nil;
+        _cameraInput = camera;
         serialQueue = dispatch_queue_create("com.opencvtut.processFrame", DISPATCH_QUEUE_PRIORITY_DEFAULT);
     }
     return self;
@@ -86,6 +84,11 @@
 
 }
 
+/*
+    Process the image, find the markers. Identify the transforms of those markers and then, pass it back to the source, using
+    the acceptor delegate
+ 
+ */
 -(void)passTransformsBack
 {
         // added to a serial queue, so that after the processing is done in the earlier block (detectFeatures
@@ -94,16 +97,16 @@
       //  dispatch_async(serialQueue,
       // ^{
            // Obtain the tranforms can pass it back to the source using acceptor delegate
-           std::vector<Transformation> transforms = _detector->getTransformations();
+            std::vector<cv::Mat> transforms = _detector->getTransformations();
 
            NSLog(@"Size : %lu" , transforms.size());
             // Convert the tranforms into SCNMatrix4 array
            
            NSMutableArray* array = [[NSMutableArray alloc] init];
            
-           for( Transformation transform : transforms)
+        for( cv::Mat& transform : transforms)
            {
-               SCNMatrix4 sceneKitTransform = [self transfromToSceneKit:transform];
+               SCNMatrix4 sceneKitTransform = [self transformToSceneKit:transform];
                // NSArray cannot hold a struct, so wrap it in an NSValue and do the inverse at the acceptor (swift) side
                [array addObject:[NSValue valueWithSCNMatrix4:sceneKitTransform]];
            }
@@ -113,38 +116,34 @@
     //   });
 }
 
--(SCNMatrix4) transfromToSceneKit:(Transformation) transform
+-(SCNMatrix4) transformToSceneKit:(cv::Mat&) transform  // This matrix is in the opengl format
 {
-    // SceneKit seems to be row major, not column major .
-    // The transformation , open gl and open cv uses column major.
-    // So SceneKit is the Transpose of the open* matrix
-    
     SCNMatrix4 mat = SCNMatrix4Identity;
+    // Place of possible error : The formats might not be handled properly yet. Read more about Apple docs
     
-    // get the rotation matrix
-    Matrix33 rot = transform.r();
-    Vector3 tran = transform.t();
-    
-    // SCNMatrix4 does not have subscript operator
     
     // Copy the rotation rows
-    mat.m11 = rot.mat[0][0];
-    mat.m12 = rot.mat[1][0];
-    mat.m13 = rot.mat[2][0];
-    
-    mat.m21 = rot.mat[0][1];
-    mat.m22 = rot.mat[1][1];
-    mat.m23 = rot.mat[2][1];
-    
-    mat.m31 = rot.mat[0][2];
-    mat.m32 = rot.mat[1][2];
-    mat.m33 = rot.mat[2][2];
+    mat.m11 = transform.at<float>(0,0);
+    mat.m12 = transform.at<float>(0,1);
+    mat.m13 = transform.at<float>(0,2);
+    mat.m14 = transform.at<float>(0,3);
    
+    mat.m21 = transform.at<float>(1,0);
+    mat.m22 = transform.at<float>(1,1);
+    mat.m23 = transform.at<float>(1,2);
+    mat.m24 = transform.at<float>(1,3);
+    
+    mat.m31 = transform.at<float>(2,0);
+    mat.m32 = transform.at<float>(2,1);
+    mat.m33 = transform.at<float>(2,2);
+    mat.m34 = transform.at<float>(2,3);
+    
     //Copy the translation rows
-    mat.m41 = tran.data[0];
-    mat.m42 = tran.data[1];
-    mat.m43 = tran.data[2];
-  
+    mat.m41 = transform.at<float>(3,0);
+    mat.m42 = transform.at<float>(3,1);
+    mat.m43 = transform.at<float>(3,2);
+    mat.m44 = transform.at<float>(3,3);
+ 
     return mat;
 }
 
@@ -164,12 +163,9 @@
 {
     
     std::cout << "Set up calibration with = Width : " << _screenWidth << " Height :" << _screenHeight << std::endl;
-    Matrix44* projMat = [self buildProjectionMatrix:_calibraion->getIntrinsic() width:_screenWidth height:_screenHeight];
-    
-    // Now convert the projMat into a tranform an use the utility func to convert into a SCNMatrix4
-    Transformation transform(projMat->getRot() , projMat->getTran());
+    cv::Mat projMat = [self buildProjectionMatrix:_calibraion->getIntrinsic() width:_screenWidth height:_screenHeight];
    
-    return [self transfromToSceneKit:transform];
+    return [self transformToSceneKit:projMat];
 }
 
 /*
@@ -190,12 +186,55 @@
     // the camera calibraion required the width and height
     _screenWidth = width;
     _screenHeight = height;
+  
+    // 1250 , 1000 : Too far from markers
+    // 1000 , 1250 : Too far from markers, but rotated
+    // 1100 , 1250 : Too far, but rotated opp above
+    // 1250 , 1250 : 
+    // 1300 , 1250 : Too far
+    // 1400 , 1250 : Too far, but no rotation
+    // 1400 , 1250 : Too far
    
-    _calibraion = new CameraCalibration(1350 , 1200 , _screenWidth, _screenHeight);
-    
+    // w  h/5 : far to markers
+    // w  h/3 : Far from markers
+    // w  h/6 : Far from markers
+    // w  h/5 : Better Closer to markers
+   
+    // w  h
+   
+
+    //_calibraion = new CameraCalibration(1360 , 1360 , _screenWidth  , _screenHeight);
+    //_calibraion = new CameraCalibration(6.24860291e+02 * (640./352.), 6.24860291e+02 * (480./288.), 320 * 0.5f, 480 * 0.5f);
+    _calibraion = [self createCameraCalibration];
     // Now we can create the detector
     _detector = new KeyPointDetector(*_calibraion);
 }
+
+-(CameraCalibration*) createCameraCalibration
+{
+    // #ERROR Is there errors here that I need to worry ABOUT ?
+    
+    AVCaptureDeviceFormat* format = self.cameraInput.device.activeFormat;
+    CMFormatDescriptionRef fDesc = format.formatDescription;
+    CGSize dm = CMVideoFormatDescriptionGetPresentationDimensions(fDesc, true, true);
+   
+    float cx = float(dm.width) / 2.0;
+    float cy = float(dm.height) / 2.0 ;
+   
+    float HFOV = format.videoFieldOfView;
+    float VFOV = ((HFOV)/cx)*cy;
+    
+    float fx = std::abs(float(dm.width) / (2 * tan(HFOV / 180 * float(M_PI) / 2)));
+    float fy = std::abs(float(dm.height) / (2 * tan(VFOV / 180 * float(M_PI) / 2)));
+    
+    //return new CameraCalibration(1229 , 1153 , 360 , 640);
+  
+    std::cout << "Obtained Calibration " << fx << " " << fx << " " << cx << " " << cy;
+    
+    return new CameraCalibration(fx , fy , cx , cy);
+    
+}
+
 
 /*
     pre : none
@@ -206,7 +245,7 @@
             Used as a utiliy function, not exposed to other classes
  */
 
-- (Matrix44 *)buildProjectionMatrix:(Matrix33)cameraMatrix width: (int)screen_width height: (int)screen_height
+- (cv::Mat)buildProjectionMatrix:(Matrix33)cameraMatrix width: (int)screen_width height: (int)screen_height
 {
     float near = 0.01;  // Near clipping distance
     float far  = 100;  // Far clipping distance
@@ -221,28 +260,34 @@
    
     // This is not the simple projection, this also does the scaling required to convert the objects from the
     // camera reference frame to the image model ?
+    
+    // Storage as column major. That is along the columns. 1st column , then 2nd column etc
+    // Same as sceneKit
+    
+    cv::Mat projectionMatrix(4,4,CV_32F);
    
-    Matrix44 *projectionMatrix = new Matrix44;
+    // ANother place of possible error. The row vs col majoring issues
+    // #ERROR
     
-    projectionMatrix->data[0] = - 2.0 * f_x / screen_width;
-    projectionMatrix->data[1] = 0.0;
-    projectionMatrix->data[2] = 0.0;
-    projectionMatrix->data[3] = 0.0;
+    projectionMatrix.at<float>(0,0) = - 2.0 * f_x / screen_width;
+    projectionMatrix.at<float>(1,0) = 0.0;
+    projectionMatrix.at<float>(2,0) = 0.0;
+    projectionMatrix.at<float>(3,0) = 0.0;
+   
+    projectionMatrix.at<float>(0,1) = 0.0;
+    projectionMatrix.at<float>(1,1) = 2.0 * f_y / screen_height;
+    projectionMatrix.at<float>(2,1) = 0.0;
+    projectionMatrix.at<float>(3,1) = 0.0;
     
-    projectionMatrix->data[4] = 0.0;
-    projectionMatrix->data[5] = 2.0 * f_y / screen_height;
-    projectionMatrix->data[6] = 0.0;
-    projectionMatrix->data[7] = 0.0;
+    projectionMatrix.at<float>(0,2) = 2.0 * c_x / screen_width - 1.0;
+    projectionMatrix.at<float>(1,2) = 2.0 * c_y / screen_height - 1.0;
+    projectionMatrix.at<float>(2,2) = -( far+near ) / ( far - near );
+    projectionMatrix.at<float>(3,2) = -1.0;
     
-    projectionMatrix->data[8] = 2.0 * c_x / screen_width - 1.0;
-    projectionMatrix->data[9] = 2.0 * c_y / screen_height - 1.0;
-    projectionMatrix->data[10] = -( far+near ) / ( far - near );
-    projectionMatrix->data[11] = -1.0;
-    
-    projectionMatrix->data[12] = 0.0;
-    projectionMatrix->data[13] = 0.0;
-    projectionMatrix->data[14] = -2.0 * far * near / ( far - near );
-    projectionMatrix->data[15] = 0.0;
+    projectionMatrix.at<float>(0,3) = 0.0;
+    projectionMatrix.at<float>(1,3) = 0.0;
+    projectionMatrix.at<float>(2,3) = -2.0 * far * near / ( far - near );
+    projectionMatrix.at<float>(3,3) = 0.0;
     
     return projectionMatrix;
 }
