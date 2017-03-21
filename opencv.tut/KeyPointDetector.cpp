@@ -371,12 +371,14 @@ void KeyPointDetector::estimatePosition(std::vector<Marker>& detectedMarkers)
         cv::Mat viewMatrix(4, 4, CV_32F); // This will hold the combined rot and trans
 
         cv::Rodrigues(Rvec, rotMat);
-        
-        rotMat = rotMat.t();
-        Tvec = -rotMat * Tvec;
+       
        
         // Copy to tranformation matrix. This matrix will be able to move from model coor to camera coor
+        
+
+        rotMat = rotMat.t();
         viewMatrix( cv::Range(0,3) , cv::Range(0,3)) = rotMat * 1;
+        Tvec = -rotMat * Tvec;
         viewMatrix( cv::Range(0,3) , cv::Range(3,4)) = Tvec * 1;
         
         float *p = viewMatrix.ptr<float>(3); // Access as float instead of double
@@ -384,13 +386,15 @@ void KeyPointDetector::estimatePosition(std::vector<Marker>& detectedMarkers)
         
         // Convert to OpenGL Format
 
+        
+        
         // convert from left hand coor in opencv to right handed coor in opengl and scenekit
         cv::Mat cvToGl = cv::Mat::zeros(4, 4, CV_32F);
         cvToGl.at<float>(0, 0) = 1.0f;
         cvToGl.at<float>(1, 1) = -1.0f; // Invert the y axis
         cvToGl.at<float>(2, 2) = -1.0f; // invert the z axis
         cvToGl.at<float>(3, 3) = 1.0f;
-        viewMatrix = cvToGl * viewMatrix;
+        viewMatrix = viewMatrix * cvToGl;
        
         // Convert from row major to column major. Is this needed ? Because SceneKit is Row Major. // ERROR POSSIBILITY
         // There are two formats in seems. Not the memory layout, but index layout.

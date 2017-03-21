@@ -255,13 +255,13 @@ extension SceneViewController : SCNSceneRendererDelegate
                     */
             
             
-            // itemCopy?.transform = SCNMatrix4Invert(transform) // This invert is not needed as this is done in the
+           // itemCopy?.transform = SCNMatrix4Invert(transform) // This invert is not needed as this is done in the
             // Keypoint side. To convert from opencv to opengl
            
             
-            itemCopy?.transform = SCNMatrix4Scale((itemCopy?.transform)!, 0.2, 0.2, 0.2)
+          //  itemCopy?.transform = SCNMatrix4Scale((itemCopy?.transform)!, 0.2, 0.2, 0.2)
             
-            print("TRANSFOMR : \(transform)")
+        //    print("TRANSFOMR : \(transform)")
             
             // TO DO : Remove the nodes from scene, else system slows down due to a large number of nodes
             self.scene.rootNode.addChildNode(itemCopy!) // where to remove
