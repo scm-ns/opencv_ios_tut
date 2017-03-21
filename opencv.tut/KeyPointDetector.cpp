@@ -383,8 +383,7 @@ void KeyPointDetector::estimatePosition(std::vector<Marker>& detectedMarkers)
         p[0] = p[1] = p[2] = 0; p[3] = 1;
         
         // Convert to OpenGL Format
-        
-        
+
         // convert from left hand coor in opencv to right handed coor in opengl and scenekit
         cv::Mat cvToGl = cv::Mat::zeros(4, 4, CV_32F);
         cvToGl.at<float>(0, 0) = 1.0f;
@@ -394,11 +393,14 @@ void KeyPointDetector::estimatePosition(std::vector<Marker>& detectedMarkers)
         viewMatrix = cvToGl * viewMatrix;
        
         // Convert from row major to column major. Is this needed ? Because SceneKit is Row Major. // ERROR POSSIBILITY
+        // There are two formats in seems. Not the memory layout, but index layout.
+        // In sceneKit and opengl it seems to be
         cv::Mat glViewMatrix = cv::Mat::zeros(4, 4, CV_32F);
         cv::transpose(viewMatrix , glViewMatrix);
        
-        //m.transformation = glViewMatrix;
-        m.transformation = viewMatrix;
+        m.transformation = glViewMatrix; // This might actualy be required. In open cv the translation is in the last column.
+                                        // in SceneKit it is the last row
+        
         // #ERROR
        
         /*

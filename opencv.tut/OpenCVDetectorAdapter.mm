@@ -116,33 +116,60 @@
     //   });
 }
 
--(SCNMatrix4) transformToSceneKit:(cv::Mat&) transform  // This matrix is in the opengl format
+-(SCNMatrix4) transformToSceneKit:(cv::Mat&) openGL_transform  // This matrix is in the opengl format
 {
     SCNMatrix4 mat = SCNMatrix4Identity;
     // Place of possible error : The formats might not be handled properly yet. Read more about Apple docs
+
+    // Scene Kit is row major. How to handle that ?
+  
+    /*
+        But why does the memory odering ever matter. Yes the data will be stored differntly in either
+        strucutres but we are not accessing memory directly, but using index access and that should
+        make the memory order irrelavent
+     
+        So the odering does not seem to be something that I need to worry about
+     */
+   
+    /*
+        In open cv the data is stored like this : 
+            
+        ROT | TRAN
+        0   |   1
+    
+     
+        In open gl + Scene kit
+     
+        ROT | 0
+         _    _
+        TRAN 1
+     
+        Here the transform has to be in the format for OpenGL
+     
+     */
     
     
     // Copy the rotation rows
-    mat.m11 = transform.at<float>(0,0);
-    mat.m12 = transform.at<float>(0,1);
-    mat.m13 = transform.at<float>(0,2);
-    mat.m14 = transform.at<float>(0,3);
+    mat.m11 = openGL_transform.at<float>(0,0);
+    mat.m12 = openGL_transform.at<float>(0,1);
+    mat.m13 = openGL_transform.at<float>(0,2);
+    mat.m14 = openGL_transform.at<float>(0,3);
    
-    mat.m21 = transform.at<float>(1,0);
-    mat.m22 = transform.at<float>(1,1);
-    mat.m23 = transform.at<float>(1,2);
-    mat.m24 = transform.at<float>(1,3);
+    mat.m21 = openGL_transform.at<float>(1,0);
+    mat.m22 = openGL_transform.at<float>(1,1);
+    mat.m23 = openGL_transform.at<float>(1,2);
+    mat.m24 = openGL_transform.at<float>(1,3);
     
-    mat.m31 = transform.at<float>(2,0);
-    mat.m32 = transform.at<float>(2,1);
-    mat.m33 = transform.at<float>(2,2);
-    mat.m34 = transform.at<float>(2,3);
+    mat.m31 = openGL_transform.at<float>(2,0);
+    mat.m32 = openGL_transform.at<float>(2,1);
+    mat.m33 = openGL_transform.at<float>(2,2);
+    mat.m34 = openGL_transform.at<float>(2,3);
     
-    //Copy the translation rows
-    mat.m41 = transform.at<float>(3,0);
-    mat.m42 = transform.at<float>(3,1);
-    mat.m43 = transform.at<float>(3,2);
-    mat.m44 = transform.at<float>(3,3);
+    //Copy the translation row. Which is the bottom row in OpenGL /SceneKIT
+    mat.m41 = openGL_transform.at<float>(3,0);
+    mat.m42 = openGL_transform.at<float>(3,1);
+    mat.m43 = openGL_transform.at<float>(3,2);
+    mat.m44 = openGL_transform.at<float>(3,3);
  
     return mat;
 }
@@ -268,6 +295,8 @@
    
     // ANother place of possible error. The row vs col majoring issues
     // #ERROR
+    // What is the format here for the projectoin matrices ?
+    
     
     projectionMatrix.at<float>(0,0) = - 2.0 * f_x / screen_width;
     projectionMatrix.at<float>(1,0) = 0.0;
