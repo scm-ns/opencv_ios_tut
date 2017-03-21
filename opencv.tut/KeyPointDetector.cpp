@@ -80,7 +80,7 @@ void KeyPointDetector::processFrame(const cv::Mat& frame)
     }
 }
 
-const std::vector<Transformation>& KeyPointDetector::getTransformations() const
+const std::vector<cv::Mat>& KeyPointDetector::getTransformations() const
 {
     return m_transformations;
 }
@@ -365,27 +365,67 @@ void KeyPointDetector::estimatePosition(std::vector<Marker>& detectedMarkers)
         cv::solvePnP(m_markerCorners3d, m.points, camMatrix, distCoeff,raux,taux);
         raux.convertTo(Rvec,CV_32F);
         taux.convertTo(Tvec ,CV_32F);
+        
+        cv::Mat_<float> rotMat(3,3);
+       
+        cv::Mat viewMatrix(4, 4, CV_32F);
 
-        cv::Mat_<float> rotMat(3,3); 
         cv::Rodrigues(Rvec, rotMat);
 
         // Copy to transformation matrix
-        for (int col=0; col<3; col++)
+        for (int row=0; row<3; row++)
         {
-            for (int row=0; row<3; row++)
+            for (int col=0; col<3; col++)
             {        
-                m.transformation.r().mat[row][col] = rotMat(row,col); // Copy rotation component
+                //m.transformation.r().mat[row][col] = rotMat(row,col); // Copy rotation component
+                viewMatrix.at<float>(row, col) = rotMat(row,col);
             }
-            m.transformation.t().data[col] = Tvec(col); // Copy translation component
+            
+            viewMatrix.at<float>(row, 3) = Tvec(row);
+
+            //m.transformation.t().data[col] = Tvec(col); // Copy translation component
         }
 
+        viewMatrix.at<float>(3 ,3) = 1;
+        
+        // Convert to OpenGL Format
+        cv::Mat cvToGl = cv::Mat::zeros(4, 4, CV_32F);
+        cvToGl.at<float>(0, 0) = 1.0f;
+        cvToGl.at<float>(1, 1) = -1.0f; // Invert the y axis
+        cvToGl.at<float>(2, 2) = -1.0f; // invert the z axis
+        cvToGl.at<float>(3, 3) = 1.0f;
+        viewMatrix = cvToGl * viewMatrix;
+       
+        // Convert from row major to column major
+        cv::Mat glViewMatrix = cv::Mat::zeros(4, 4, CV_32F);
+        cv::transpose(viewMatrix , glViewMatrix);
+       
+        //m.transformation = glViewMatrix;
+        m.transformation = viewMatrix;
+        // #ERROR
+       
+        /*
+            Discussions about the format.
+                   pnp gives me tranformation matrix to move from model coor to camera coor
+                    But usually the tranform is applied on the camera, so I might have to invert is so that
+         
+         
+         
+         */
+        
+        
+        
         // PnP finds the camera in the model space. We want to find the marker model in the camera coordinate space
         // so we invert it.
         // Also the output of this is a rot and trans matrix corresponding to the extrinsic parameters which are needed.
         // the conversion from the 3d model to the 2d space is done using the internal parameters of the camera.
         // Since solvePnP finds camera location, w.r.t to marker pose, to get marker pose w.r.t to the camera we invert it.
-        m.transformation = m.transformation.getInverted();
+       
         
+        //m.transformation = m.transformation.getInverted(); // This is wrong it seems.
+        
+            // Nope this tranformation is necessary. But how to do this transormation ?
+        // I need to
         
        // So how does this transformation help up..
         // It tells us where the marker is located in the camera coordinates
@@ -396,7 +436,7 @@ void KeyPointDetector::estimatePosition(std::vector<Marker>& detectedMarkers)
         // 3d scene into 2d space.
         // This is where open gl can help us.
         
-        
+
         
     }
 }

@@ -35,7 +35,7 @@ public:
   //! Searches for markes and fills the list of transformation for found markers
   void processFrame(const cv::Mat& frame);
   
-  const std::vector<Transformation>& getTransformations() const;
+    const std::vector<cv::Mat>& getTransformations() const;
   
 protected:
 
@@ -66,7 +66,7 @@ private:
   cv::Size markerSize;
   cv::Mat camMatrix;
   cv::Mat distCoeff;
-  std::vector<Transformation> m_transformations;
+  std::vector<cv::Mat> m_transformations;
   
   cv::Mat m_grayscaleImage;
   cv::Mat m_thresholdImg;  
