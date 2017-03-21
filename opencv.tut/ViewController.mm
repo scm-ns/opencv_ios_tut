@@ -148,7 +148,7 @@
     // And perform processing in current thread
     
     markerDetector->processFrame(image);
-    std::vector<Transformation> trans = markerDetector->getTransformations();
+    std::vector<cv::Mat> trans = markerDetector->getTransformations();
     
     NSLog(@"Size : %lu" , trans.size());
     

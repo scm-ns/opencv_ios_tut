@@ -74,6 +74,7 @@
    
     // This is not the simple projection, this also does the scaling required to convert the objects from the
     // camera reference frame to the image model ?
+  
     
     projectionMatrix.data[0] = - 2.0 * f_x / screen_width;
     projectionMatrix.data[1] = 0.0;

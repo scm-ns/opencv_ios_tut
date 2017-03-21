@@ -9,8 +9,8 @@
 #include <opencv2/opencv.hpp>
 
 ////////////////////////////////////////////////////////////////////
-// File includes:
-#include "GeometryTypes.hpp"
+
+
 
 /**
  * This class represents a marker
@@ -33,8 +33,8 @@ public:
   // Id of  the marker
   int id;
   
-  // Marker transformation with regards to the camera
-  Transformation transformation;
+
+  cv::Mat transformation;
   
   std::vector<cv::Point2f> points;
 
