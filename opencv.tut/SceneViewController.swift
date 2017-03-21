@@ -224,10 +224,32 @@ extension SceneViewController : SCNSceneRendererDelegate
            
             
             // Position the model in the right location in the 3D camera coor
+           
             
-            //itemCopy?.transform = transform
             
-            itemCopy?.transform = SCNMatrix4Invert(transform)
+            itemCopy?.transform = transform
+            // POSSIBLE ERRORS :
+            
+            //  1) Should this transform be applied at the camera node. I see examples where this is done
+                    /* Ans :
+                            No real answer, but in that example the rendering was done in a different manner. Does that 
+                            have any significance. It was a vuforia scene kit example.
+                    */
+            
+            //  2) The tranform is applied relative to root node. What significance does this have ? Will the root node have
+                        // a different transform ?
+            //  3) Does this make logical sense ?
+                    /* Ans :
+             
+                        I am applying a transform used to move the model from NDC to camera coor to the transform property of the node.
+                        That makes sense. A thing to worry about is that the transform is applied realive to the parent node,
+                        so this could be an error source.
+                    */
+            
+            
+            // itemCopy?.transform = SCNMatrix4Invert(transform) // This invert is not needed as this is done in the
+            // Keypoint side. To convert from opencv to opengl
+           
             
             itemCopy?.transform = SCNMatrix4Scale((itemCopy?.transform)!, 0.2, 0.2, 0.2)
             
