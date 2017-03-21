@@ -112,6 +112,13 @@ class SceneViewController: UIViewController
             let prespectiveTransform = self.featureDetector.getPrespectiveSCNMatrix4()
             print("PRESPECTIVE TRANSFORM \(prespectiveTransform)")
             self.cameraNode.camera?.projectionTransform = prespectiveTransform
+            // ERROR : 
+                /*
+                    Is the format of the prepecitve tranform correct ? What is apples default prespective tranform ? 
+                    TO DO : Compare the tranform that is default and the one that I set see what hte differences are ? 
+                */
+        
+        
            // let angleInRad : Float = Float(90 * M_PI)/180.0
            // self.cameraNode.camera?.projectionTransform = SCNMatrix4Rotate(prespectiveTransform, 1, 1, 0, angleInRad);
         
