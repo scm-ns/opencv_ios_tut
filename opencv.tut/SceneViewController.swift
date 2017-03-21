@@ -24,7 +24,6 @@
                     1) getting the prespective transform and applying it to the camera node
                     2) Applying the transform of the model to be the same as the transform of the marker.
  
- 
         Issues : 
                     1) Inverse relation between the transforms used by OPENCV/GL and Scene Kit.
                         Am I doing this conversion properly ?
@@ -110,12 +109,13 @@ class SceneViewController: UIViewController
             self.featureDetector.setScreenProperties(Int32(self.view.bounds.width), height: Int32(self.view.bounds.height))
         
             let prespectiveTransform = self.featureDetector.getPrespectiveSCNMatrix4()
-            print("PRESPECTIVE TRANSFORM \(prespectiveTransform)")
+            print("PRESPECTIVE TRANSFORM BEFORE :\(self.cameraNode.camera?.projectionTransform)")
+            print("PRESPECTIVE TRANSFORM AFTER :\(prespectiveTransform)")
             self.cameraNode.camera?.projectionTransform = prespectiveTransform
-            // ERROR : 
+            // ERROR :
                 /*
-                    Is the format of the prepecitve tranform correct ? What is apples default prespective tranform ? 
-                    TO DO : Compare the tranform that is default and the one that I set see what hte differences are ? 
+                    Is the format of the prepecitve tranform correct ? What is apples default prespective tranform ?
+                    TO DO : Compare the tranform that is default and the one that I set see what hte differences are ?
                 */
         
         
@@ -260,7 +260,7 @@ extension SceneViewController : SCNSceneRendererDelegate
             
             itemCopy?.transform = SCNMatrix4Scale((itemCopy?.transform)!, 0.2, 0.2, 0.2)
             
-           // print("TRANSFOMR : \(transform)")
+            print("TRANSFOMR : \(transform)")
             
             // TO DO : Remove the nodes from scene, else system slows down due to a large number of nodes
             self.scene.rootNode.addChildNode(itemCopy!) // where to remove
