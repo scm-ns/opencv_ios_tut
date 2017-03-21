@@ -368,27 +368,24 @@ void KeyPointDetector::estimatePosition(std::vector<Marker>& detectedMarkers)
         
         cv::Mat_<float> rotMat(3,3);
        
-        cv::Mat viewMatrix(4, 4, CV_32F);
+        cv::Mat viewMatrix(4, 4, CV_32F); // This will hold the combined rot and trans
 
         cv::Rodrigues(Rvec, rotMat);
-
-        // Copy to transformation matrix
-        for (int row=0; row<3; row++)
-        {
-            for (int col=0; col<3; col++)
-            {        
-                //m.transformation.r().mat[row][col] = rotMat(row,col); // Copy rotation component
-                viewMatrix.at<float>(row, col) = rotMat(row,col);
-            }
-            
-            viewMatrix.at<float>(row, 3) = Tvec(row);
-
-            //m.transformation.t().data[col] = Tvec(col); // Copy translation component
-        }
-
-        viewMatrix.at<float>(3 ,3) = 1;
+        
+        rotMat = rotMat.t();
+        Tvec = -rotMat * Tvec;
+       
+        // Copy to tranformation matrix. This matrix will be able to move from model coor to camera coor
+        viewMatrix( cv::Range(0,3) , cv::Range(0,3)) = rotMat * 1;
+        viewMatrix( cv::Range(0,3) , cv::Range(3,4)) = Tvec * 1;
+        
+        double *p = viewMatrix.ptr<double>(3);
+        p[0] = p[1] = p[2] = 0; p[3] = 1;
         
         // Convert to OpenGL Format
+        
+        
+        // convert from left hand coor in opencv to right handed coor in opengl and scenekit
         cv::Mat cvToGl = cv::Mat::zeros(4, 4, CV_32F);
         cvToGl.at<float>(0, 0) = 1.0f;
         cvToGl.at<float>(1, 1) = -1.0f; // Invert the y axis
@@ -396,7 +393,7 @@ void KeyPointDetector::estimatePosition(std::vector<Marker>& detectedMarkers)
         cvToGl.at<float>(3, 3) = 1.0f;
         viewMatrix = cvToGl * viewMatrix;
        
-        // Convert from row major to column major
+        // Convert from row major to column major. Is this needed ? Because SceneKit is Row Major. // ERROR POSSIBILITY
         cv::Mat glViewMatrix = cv::Mat::zeros(4, 4, CV_32F);
         cv::transpose(viewMatrix , glViewMatrix);
        
@@ -408,10 +405,19 @@ void KeyPointDetector::estimatePosition(std::vector<Marker>& detectedMarkers)
             Discussions about the format.
                    pnp gives me tranformation matrix to move from model coor to camera coor
                     But usually the tranform is applied on the camera, so I might have to invert is so that
+            
+            No ,pnp gives me the camera location in the model coor. So to convert from the model coor to camera coor,
+            it need to get its inverse.
          
+            Now that the format is in opencv . I need to move it back to scene kit form.
          
+            But scenekit is row-major. There is no reason to expect that some guy of the internet knows more that
+            apple docs. There should have been so many checks in the docs.
          
          */
+       
+        
+        
         
         
         
