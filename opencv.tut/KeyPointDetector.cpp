@@ -379,7 +379,7 @@ void KeyPointDetector::estimatePosition(std::vector<Marker>& detectedMarkers)
         viewMatrix( cv::Range(0,3) , cv::Range(0,3)) = rotMat * 1;
         viewMatrix( cv::Range(0,3) , cv::Range(3,4)) = Tvec * 1;
         
-        double *p = viewMatrix.ptr<double>(3);
+        float *p = viewMatrix.ptr<float>(3); // Access as float instead of double
         p[0] = p[1] = p[2] = 0; p[3] = 1;
         
         // Convert to OpenGL Format

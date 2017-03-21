@@ -110,6 +110,7 @@ class SceneViewController: UIViewController
         
             let prespectiveTransform = self.featureDetector.getPrespectiveSCNMatrix4()
             print("PRESPECTIVE TRANSFORM BEFORE :\(self.cameraNode.camera?.projectionTransform)")
+            // The formats seem to be alright. Where could be error source be then ?
             print("PRESPECTIVE TRANSFORM AFTER :\(prespectiveTransform)")
             self.cameraNode.camera?.projectionTransform = prespectiveTransform
             // ERROR :
