@@ -36,27 +36,27 @@ import SceneKit
 import AVFoundation
 import CoreLocation
 
-class SceneViewController: UIViewController , AVCaptureVideoDataOutputSampleBufferDelegate , SCNSceneRendererDelegate , TransformAcceptorDelegate
+class SceneViewController: UIViewController 
 {
     
-    private var cameraSession : AVCaptureSession?
-    private var cameraLayer : AVCaptureVideoPreviewLayer?
-    private let cameraProcessQeueu : DispatchQueue
+    fileprivate var cameraSession : AVCaptureSession?
+    fileprivate var cameraInput : AVCaptureDeviceInput?
+    fileprivate var cameraLayer : AVCaptureVideoPreviewLayer?
+    fileprivate let cameraProcessQeueu : DispatchQueue
 
-    private var featureDetector : (FeatureDetectorDelegate & PrespectiveProjBuilder)! = nil
+    fileprivate var featureDetector : (FeatureDetectorDelegate & PrespectiveProjBuilder)! = nil
     
-    private let scene = SCNScene()
-    private var sceneView : SCNView? = nil
-    private let cameraNode = SCNNode()
-    private var itemNode : SCNNode? = nil
+    fileprivate let scene = SCNScene()
+    fileprivate var sceneView : SCNView? = nil
+    fileprivate let cameraNode = SCNNode()
+    fileprivate var itemNode : SCNNode? = nil
     
-    private var nodeTransforms : [SCNMatrix4] = []
+    fileprivate var nodeTransforms : [SCNMatrix4] = []
     
     init()
     {
             cameraProcessQeueu =  DispatchQueue(label: "com.camera_process_queue.serial") // by default serial queue
             super.init(nibName: nil, bundle: nil)
-            featureDetector = OpenCVDetectorAdapter(acceptor: self)
     }
     
     required init?(coder aDecoder: NSCoder)
@@ -77,17 +77,17 @@ class SceneViewController: UIViewController , AVCaptureVideoDataOutputSampleBuff
     {
         super.viewDidLoad()
         self.setupCameraCapture()
-        self.setupCameraFeed()
+        
+        featureDetector = OpenCVDetectorAdapter(acceptor: self, cameraInput: self.cameraInput!)
+        
         self.setupSceneKitView()
         self.positionSceneKitCamera()
         self.loadSceneNodes()
-//        self.positionSceneNodes()
         
-        
-        self.cameraProcessQeueu.async
-        {
+        //self.cameraProcessQeueu.async
+       // {
                 self.cameraSession?.startRunning()
-        }
+        //}
     }
 
     /*
@@ -110,55 +110,14 @@ class SceneViewController: UIViewController , AVCaptureVideoDataOutputSampleBuff
             self.featureDetector.setScreenProperties(Int32(self.view.bounds.width), height: Int32(self.view.bounds.height))
         
             let prespectiveTransform = self.featureDetector.getPrespectiveSCNMatrix4()
+            print("PRESPECTIVE TRANSFORM \(prespectiveTransform)")
             self.cameraNode.camera?.projectionTransform = prespectiveTransform
+           // let angleInRad : Float = Float(90 * M_PI)/180.0
+           // self.cameraNode.camera?.projectionTransform = SCNMatrix4Rotate(prespectiveTransform, 1, 1, 0, angleInRad);
+        
     }
     
-    
-    /*
-        desc : 
-            Called by the SCNView before appying the animations and physics for each
-            frame. Called once a frame. Update the position of the itemNodes here
-            using the transformations that are avaliable.
-            
-            During each step of the render loop the markers transforms obtained by using opencv
-            is used to draw the models.
- 
-    */
-    func renderer(_ renderer: SCNSceneRenderer, updateAtTime time: TimeInterval)
-    {
-        var itemCopy : SCNNode?
-      
-        guard let item = self.itemNode else
-        {
-           return
-        }
-       
-        // Remove all the previously drawn items
-        // Inefficient work on
-        for node in self.scene.rootNode.childNodes
-        {
-            node.removeFromParentNode()
-        }
-        
-        for transform in self.nodeTransforms // If items have been identified. Then place an object on top of it.
-        {
-            itemCopy = item.clone() // Copy the 3D model so that we can have mulitple models if there are multiple makers
-           
-            // Position the model in the right location in the 3D camera coor
-            itemCopy?.transform = transform
-            
-            itemCopy?.scale = SCNVector3(x : 0.1 , y : 0.1 , z : 0.1);
-            
-            //print(transform)
-            
-            // TO DO : Remove the nodes from scene, else system slows down due to a large number of nodes
-            self.scene.rootNode.addChildNode(itemCopy!) // where to remove
-            //print("draw item ")
-        }
-        
-        //print("Rendering")
-    }
-    
+   
     /*
         pre :
         post :
@@ -194,6 +153,7 @@ class SceneViewController: UIViewController , AVCaptureVideoDataOutputSampleBuff
         let node = sceneForLoading?.rootNode.childNode(withName: "ship", recursively: true)
         if let node = node
         {
+            node.scale = SCNVector3Make(0.1, 0.1, 0.1)
             self.itemNode = node
         }
         else
@@ -226,6 +186,67 @@ class SceneViewController: UIViewController , AVCaptureVideoDataOutputSampleBuff
             self.sceneView?.backgroundColor = UIColor.clear
             self.view.addSubview(self.sceneView!)
     }
+ 
+}
+
+extension SceneViewController : SCNSceneRendererDelegate
+{
+  
+    /*
+        desc : 
+            Called by the SCNView before appying the animations and physics for each
+            frame. Called once a frame. Update the position of the itemNodes here
+            using the transformations that are avaliable.
+            
+            During each step of the render loop the markers transforms obtained by using opencv
+            is used to draw the models.
+ 
+    */
+    func renderer(_ renderer: SCNSceneRenderer, updateAtTime time: TimeInterval)
+    {
+        var itemCopy : SCNNode?
+      
+        guard let item = self.itemNode else
+        {
+           return
+        }
+       
+        // Remove all the previously drawn items
+        // Inefficient work on
+        for node in self.scene.rootNode.childNodes
+        {
+            node.removeFromParentNode()
+        }
+        
+        for transform in self.nodeTransforms // If items have been identified. Then place an object on top of it.
+        {
+            itemCopy = item.clone() // Copy the 3D model so that we can have mulitple models if there are multiple makers
+           
+            
+            // Position the model in the right location in the 3D camera coor
+            
+            //itemCopy?.transform = transform
+            
+            itemCopy?.transform = SCNMatrix4Invert(transform)
+            
+            itemCopy?.transform = SCNMatrix4Scale((itemCopy?.transform)!, 0.2, 0.2, 0.2)
+            
+           // print("TRANSFOMR : \(transform)")
+            
+            // TO DO : Remove the nodes from scene, else system slows down due to a large number of nodes
+            self.scene.rootNode.addChildNode(itemCopy!) // where to remove
+            //print("draw item ")
+        }
+        
+        //print("Rendering")
+    }
+       
+}
+
+
+// Extensions for setting up the camera and conforming to the delegate
+extension SceneViewController : AVCaptureVideoDataOutputSampleBufferDelegate
+{
     
     /*
         pre : done during init
@@ -240,8 +261,8 @@ class SceneViewController: UIViewController , AVCaptureVideoDataOutputSampleBuff
     */
     func setupCameraCapture() 
     {
-            self.cameraProcessQeueu.async
-            {
+    //        self.cameraProcessQeueu.async
+     //       {
                 let backCamera = AVCaptureDevice.defaultDevice(withDeviceType: .builtInWideAngleCamera, mediaType: AVMediaTypeVideo, position: .back)
                 
                 guard backCamera != nil else
@@ -273,6 +294,8 @@ class SceneViewController: UIViewController , AVCaptureVideoDataOutputSampleBuff
                     return
                 }
                 
+                self.cameraInput = cameraInput
+                
                 self.cameraSession = AVCaptureSession()
                 
                 if (self.cameraSession?.canAddInput(cameraInput))!
@@ -303,7 +326,7 @@ class SceneViewController: UIViewController , AVCaptureVideoDataOutputSampleBuff
                
                 self.setupCameraFeed()
                 
-        }
+        //}
         
     }
    
@@ -367,7 +390,13 @@ class SceneViewController: UIViewController , AVCaptureVideoDataOutputSampleBuff
         // Process each frame. Reduce this to lower numbers
         featureDetector.detectFeatures(sampleBuffer)
     }
-   
+  
+}
+
+
+extension SceneViewController : TransformAcceptorDelegate
+{
+    
     /*
         pre : feature has to be detected before the transforms can be obtained.
         post :
@@ -405,6 +434,8 @@ class SceneViewController: UIViewController , AVCaptureVideoDataOutputSampleBuff
     }
    
 }
+
+
 
 
 /*
