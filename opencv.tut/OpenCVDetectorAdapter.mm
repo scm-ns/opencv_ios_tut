@@ -213,25 +213,7 @@
     // the camera calibraion required the width and height
     _screenWidth = width;
     _screenHeight = height;
-  
-    // 1250 , 1000 : Too far from markers
-    // 1000 , 1250 : Too far from markers, but rotated
-    // 1100 , 1250 : Too far, but rotated opp above
-    // 1250 , 1250 : 
-    // 1300 , 1250 : Too far
-    // 1400 , 1250 : Too far, but no rotation
-    // 1400 , 1250 : Too far
-   
-    // w  h/5 : far to markers
-    // w  h/3 : Far from markers
-    // w  h/6 : Far from markers
-    // w  h/5 : Better Closer to markers
-   
-    // w  h
-   
-
-    //_calibraion = new CameraCalibration(1360 , 1360 , _screenWidth  , _screenHeight);
-    //_calibraion = new CameraCalibration(6.24860291e+02 * (640./352.), 6.24860291e+02 * (480./288.), 320 * 0.5f, 480 * 0.5f);
+    
     _calibraion = [self createCameraCalibration];
     // Now we can create the detector
     _detector = new KeyPointDetector(*_calibraion);
@@ -254,12 +236,9 @@
     float fx = std::abs(float(dm.width) / (2 * tan(HFOV / 180 * float(M_PI) / 2)));
     float fy = std::abs(float(dm.height) / (2 * tan(VFOV / 180 * float(M_PI) / 2)));
     
-    //return new CameraCalibration(1229 , 1153 , 360 , 640);
-  
     std::cout << "Obtained Calibration " << fx << " " << fx << " " << cx << " " << cy;
     
     return new CameraCalibration(fx , fy , cx , cy);
-    
 }
 
 
@@ -296,7 +275,10 @@
     // ANother place of possible error. The row vs col majoring issues
     // #ERROR
     // What is the format here for the projectoin matrices ?
-    
+  
+    // ERROR POSSIBILITY HIGH
+    // This formula has not beed found anywhere other than the opencv book
+        // There is a high probability of being wrong here. 
     
     projectionMatrix.at<float>(0,0) = - 2.0 * f_x / screen_width;
     projectionMatrix.at<float>(1,0) = 0.0;
@@ -318,7 +300,8 @@
     projectionMatrix.at<float>(2,3) = -2.0 * far * near / ( far - near );
     projectionMatrix.at<float>(3,3) = 0.0;
     
-    return projectionMatrix;
+    return projectionMatrix.t(); // Scene kit only behaves properly, when this matrix is transposed.
+    // Else the x and y axis are screwed up. I spend hours due to this bug.
 }
 
 

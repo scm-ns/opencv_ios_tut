@@ -375,10 +375,9 @@ void KeyPointDetector::estimatePosition(std::vector<Marker>& detectedMarkers)
        
         // Copy to tranformation matrix. This matrix will be able to move from model coor to camera coor
         
-
         rotMat = rotMat.t();
         viewMatrix( cv::Range(0,3) , cv::Range(0,3)) = rotMat * 1;
-        Tvec = -rotMat * Tvec;
+        Tvec = -rotMat*Tvec; // Why not multiplied by rotMat ?
         viewMatrix( cv::Range(0,3) , cv::Range(3,4)) = Tvec * 1;
         
         float *p = viewMatrix.ptr<float>(3); // Access as float instead of double
@@ -387,15 +386,17 @@ void KeyPointDetector::estimatePosition(std::vector<Marker>& detectedMarkers)
         // Convert to OpenGL Format
 
         
-        
         // convert from left hand coor in opencv to right handed coor in opengl and scenekit
         cv::Mat cvToGl = cv::Mat::zeros(4, 4, CV_32F);
         cvToGl.at<float>(0, 0) = 1.0f;
         cvToGl.at<float>(1, 1) = -1.0f; // Invert the y axis
         cvToGl.at<float>(2, 2) = -1.0f; // invert the z axis
         cvToGl.at<float>(3, 3) = 1.0f;
-        viewMatrix = viewMatrix * cvToGl;
-       
+            // ERROR : POSSIBILITY
+        viewMatrix = viewMatrix * cvToGl; // This is right, for what I read in open cv.
+     
+        
+
         // Convert from row major to column major. Is this needed ? Because SceneKit is Row Major. // ERROR POSSIBILITY
         // There are two formats in seems. Not the memory layout, but index layout.
         // In sceneKit and opengl it seems to be
@@ -423,18 +424,12 @@ void KeyPointDetector::estimatePosition(std::vector<Marker>& detectedMarkers)
          */
        
         
-        
-        
-        
-        
         // PnP finds the camera in the model space. We want to find the marker model in the camera coordinate space
         // so we invert it.
         // Also the output of this is a rot and trans matrix corresponding to the extrinsic parameters which are needed.
         // the conversion from the 3d model to the 2d space is done using the internal parameters of the camera.
         // Since solvePnP finds camera location, w.r.t to marker pose, to get marker pose w.r.t to the camera we invert it.
        
-        
-        //m.transformation = m.transformation.getInverted(); // This is wrong it seems.
         
             // Nope this tranformation is necessary. But how to do this transormation ?
         // I need to

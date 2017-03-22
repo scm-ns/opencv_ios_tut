@@ -258,8 +258,7 @@ extension SceneViewController : SCNSceneRendererDelegate
            // itemCopy?.transform = SCNMatrix4Invert(transform) // This invert is not needed as this is done in the
             // Keypoint side. To convert from opencv to opengl
            
-            
-          //  itemCopy?.transform = SCNMatrix4Scale((itemCopy?.transform)!, 0.2, 0.2, 0.2)
+            itemCopy?.transform = SCNMatrix4Scale((itemCopy?.transform)!, 0.5, 0.5, 0.5)
             
         //    print("TRANSFOMR : \(transform)")
             
