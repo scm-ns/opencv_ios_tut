@@ -375,74 +375,47 @@ void KeyPointDetector::estimatePosition(std::vector<Marker>& detectedMarkers)
        
         // Copy to tranformation matrix. This matrix will be able to move from model coor to camera coor
         
-        rotMat = rotMat.t();
+
         viewMatrix( cv::Range(0,3) , cv::Range(0,3)) = rotMat * 1;
-        Tvec = -rotMat*Tvec; // Why not multiplied by rotMat ?
-        viewMatrix( cv::Range(0,3) , cv::Range(3,4)) = Tvec * 1;
+
+        viewMatrix( cv::Range(0,3) , cv::Range(3,4)) = -Tvec *1;
         
         float *p = viewMatrix.ptr<float>(3); // Access as float instead of double
         p[0] = p[1] = p[2] = 0; p[3] = 1;
         
         // Convert to OpenGL Format
 
-        
+        std::cout << viewMatrix << std::endl; ;
+
         // convert from left hand coor in opencv to right handed coor in opengl and scenekit
         cv::Mat cvToGl = cv::Mat::zeros(4, 4, CV_32F);
         cvToGl.at<float>(0, 0) = 1.0f;
-        cvToGl.at<float>(1, 1) = -1.0f; // Invert the y axis
-        cvToGl.at<float>(2, 2) = -1.0f; // invert the z axis
+        cvToGl.at<float>(1, 1) = 1.0f; // Invert the y axis.
+        cvToGl.at<float>(2, 2) = 1.0f; // invert the z axis
         cvToGl.at<float>(3, 3) = 1.0f;
             // ERROR : POSSIBILITY
-        viewMatrix = viewMatrix * cvToGl; // This is right, for what I read in open cv.
-     
-        
+        viewMatrix = cvToGl * viewMatrix; // This is right, for what I read in open cv.
 
-        // Convert from row major to column major. Is this needed ? Because SceneKit is Row Major. // ERROR POSSIBILITY
-        // There are two formats in seems. Not the memory layout, but index layout.
-        // In sceneKit and opengl it seems to be
-        cv::Mat glViewMatrix = cv::Mat::zeros(4, 4, CV_32F);
-        cv::transpose(viewMatrix , glViewMatrix);
-       
-        m.transformation = glViewMatrix; // This might actualy be required. In open cv the translation is in the last column.
-                                        // in SceneKit it is the last row
-        
-        // #ERROR
-       
         /*
-            Discussions about the format.
-                   pnp gives me tranformation matrix to move from model coor to camera coor
-                    But usually the tranform is applied on the camera, so I might have to invert is so that
-            
-            No ,pnp gives me the camera location in the model coor. So to convert from the model coor to camera coor,
-            it need to get its inverse.
+            When moving from a left handed system to a right handed system.
+        
+            How do I invert the axis ? How to make sure that this transformation
+            is done properly ?
          
-            Now that the format is in opencv . I need to move it back to scene kit form.
+        
+            In the old way of using open gl directly. I was not inverting the axis.
+            But I might have been handling it in the projection matrix.
+       
+            Other things to keep in mind.
+        
          
-            But scenekit is row-major. There is no reason to expect that some guy of the internet knows more that
-            apple docs. There should have been so many checks in the docs.
          
          */
-       
         
-        // PnP finds the camera in the model space. We want to find the marker model in the camera coordinate space
-        // so we invert it.
-        // Also the output of this is a rot and trans matrix corresponding to the extrinsic parameters which are needed.
-        // the conversion from the 3d model to the 2d space is done using the internal parameters of the camera.
-        // Since solvePnP finds camera location, w.r.t to marker pose, to get marker pose w.r.t to the camera we invert it.
-       
         
-            // Nope this tranformation is necessary. But how to do this transormation ?
-        // I need to
-        
-       // So how does this transformation help up..
-        // It tells us where the marker is located in the camera coordinates
-        // This is awesome as we can use the same transformations and apply it to a 3d Model to convert it from
-        // 3D space model space into camera coordinates...
-        
-        // This is awesome after this conversion the model will coincide with the marker , now we just need to render the
-        // 3d scene into 2d space.
-        // This is where open gl can help us.
-        
+        m.transformation = viewMatrix;
+      
+        std::cout << viewMatrix << std::endl; ;
 
         
     }
