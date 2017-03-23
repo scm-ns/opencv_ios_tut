@@ -56,6 +56,7 @@ class SceneViewController: UIViewController
     {
             cameraProcessQeueu =  DispatchQueue(label: "com.camera_process_queue.serial") // by default serial queue
             super.init(nibName: nil, bundle: nil)
+        
     }
     
     required init?(coder aDecoder: NSCoder)
@@ -109,10 +110,28 @@ class SceneViewController: UIViewController
             self.featureDetector.setScreenProperties(Int32(self.view.bounds.width), height: Int32(self.view.bounds.height))
         
             let prespectiveTransform = self.featureDetector.getPrespectiveSCNMatrix4()
+        
             print("PRESPECTIVE TRANSFORM BEFORE :\(self.cameraNode.camera?.projectionTransform)")
             // The formats seem to be alright. Where could be error source be then ?
-            print("PRESPECTIVE TRANSFORM AFTER :\(prespectiveTransform)")
             self.cameraNode.camera?.projectionTransform = prespectiveTransform
+        
+            print("PRESPECTIVE TRANSFORM AFTER :\(self.cameraNode.camera?.projectionTransform)")
+      
+            // This is the most important step that was missed.
+            // Without setting this property, the projection matrix of the camera node is not used.
+        
+            self.sceneView?.pointOfView = self.cameraNode  // I should have read more from the docs
+            self.sceneView?.debugOptions = .showBoundingBoxes
+            print("FOVx : \(self.cameraNode.camera?.xFov)")
+            print("FOVx : \(self.cameraNode.camera?.yFov)")
+            print("FOVx : \(self.cameraNode.camera?.zNear)")
+            print("FOVx : \(self.cameraNode.camera?.zFar)")
+       
+            self.sceneView?.allowsCameraControl = true
+       
+        
+        
+        
             // ERROR :
                 /*
                     Is the format of the prepecitve tranform correct ? What is apples default prespective tranform ?
@@ -179,7 +198,7 @@ class SceneViewController: UIViewController
         print(self.cameraNode.camera?.projectionTransform ?? "WE")
 
         self.setupPrespectiveTranformInSceneKit()
-        self.scene.rootNode.addChildNode(self.cameraNode)
+        //self.scene.rootNode.addChildNode(self.cameraNode)
         
         print(self.cameraNode.camera?.projectionTransform ?? "WE")
     }
@@ -228,14 +247,19 @@ extension SceneViewController : SCNSceneRendererDelegate
         
         for transform in self.nodeTransforms // If items have been identified. Then place an object on top of it.
         {
-            itemCopy = item.clone() // Copy the 3D model so that we can have mulitple models if there are multiple makers
+           // itemCopy = item.clone() // Copy the 3D model so that we can have mulitple models if there are multiple makers
            
             
             // Position the model in the right location in the 3D camera coor
-           
+            
+            let boxGeometry = SCNPyramid()
+            let boxNode = SCNNode(geometry: boxGeometry)
+            boxNode.transform = transform
+            scene.rootNode.addChildNode(boxNode)
             
             
-            itemCopy?.transform = transform
+            //boxNode.transform = SCNMatrix4Invert(transform) // This invert is not needed as this is done in the
+            //itemCopy?.transform = transform
             // POSSIBLE ERRORS :
             
             //  1) Should this transform be applied at the camera node. I see examples where this is done
@@ -258,12 +282,12 @@ extension SceneViewController : SCNSceneRendererDelegate
            // itemCopy?.transform = SCNMatrix4Invert(transform) // This invert is not needed as this is done in the
             // Keypoint side. To convert from opencv to opengl
            
-            itemCopy?.transform = SCNMatrix4Scale((itemCopy?.transform)!, 0.5, 0.5, 0.5)
+            //itemCopy?.transform = SCNMatrix4Scale((itemCopy?.transform)!, 0.5, 0.5, 0.5)
             
-        //    print("TRANSFOMR : \(transform)")
+            //print("TRANSFOMR : \(transform)")
             
             // TO DO : Remove the nodes from scene, else system slows down due to a large number of nodes
-            self.scene.rootNode.addChildNode(itemCopy!) // where to remove
+            //self.scene.rootNode.addChildNode(itemCopy!) // where to remove
             //print("draw item ")
         }
         
@@ -355,8 +379,6 @@ extension SceneViewController : AVCaptureVideoDataOutputSampleBufferDelegate
                
                 self.setupCameraFeed()
                 
-        //}
-        
     }
    
     /*
