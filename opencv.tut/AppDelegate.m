@@ -7,7 +7,6 @@
 //
 
 #import "AppDelegate.h"
-#import "ViewController.h"
 #import "opencv_tut-Swift.h"
 
 @interface AppDelegate ()

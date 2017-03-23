@@ -10,11 +10,8 @@
 		3660FEB11E79DD25003B4907 /* SceneViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3660FEB01E79DD25003B4907 /* SceneViewController.swift */; };
 		3660FED31E79EE92003B4907 /* art.scnassets in Resources */ = {isa = PBXBuildFile; fileRef = 3660FED21E79EE92003B4907 /* art.scnassets */; };
 		3660FED61E7A77FA003B4907 /* OpenCVDetectorAdapter.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3660FED51E7A77FA003B4907 /* OpenCVDetectorAdapter.mm */; };
-		36793B971E68E44C00A35A93 /* EAGLView.m in Sources */ = {isa = PBXBuildFile; fileRef = 36793B941E68E44C00A35A93 /* EAGLView.m */; };
-		36793B981E68E44C00A35A93 /* SimpleVisualizationController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 36793B961E68E44C00A35A93 /* SimpleVisualizationController.mm */; };
 		36939DA11E5E6DC400F7E160 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 36939DA01E5E6DC400F7E160 /* main.m */; };
 		36939DA41E5E6DC400F7E160 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 36939DA31E5E6DC400F7E160 /* AppDelegate.m */; };
-		36939DA71E5E6DC400F7E160 /* ViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 36939DA61E5E6DC400F7E160 /* ViewController.mm */; };
 		36939DAC1E5E6DC400F7E160 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 36939DAB1E5E6DC400F7E160 /* Assets.xcassets */; };
 		36939DB81E5E6DC500F7E160 /* AssetsLibrary.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 36939DB71E5E6DC500F7E160 /* AssetsLibrary.framework */; };
 		36939DBA1E5E6DC500F7E160 /* opencv2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 36939DB91E5E6DC500F7E160 /* opencv2.framework */; };
@@ -37,16 +34,10 @@
 		3660FED21E79EE92003B4907 /* art.scnassets */ = {isa = PBXFileReference; lastKnownFileType = wrapper.scnassets; path = art.scnassets; sourceTree = "<group>"; };
 		3660FED41E7A77FA003B4907 /* OpenCVDetectorAdapter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OpenCVDetectorAdapter.h; sourceTree = "<group>"; };
 		3660FED51E7A77FA003B4907 /* OpenCVDetectorAdapter.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = OpenCVDetectorAdapter.mm; sourceTree = "<group>"; };
-		36793B931E68E44C00A35A93 /* EAGLView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EAGLView.h; sourceTree = "<group>"; };
-		36793B941E68E44C00A35A93 /* EAGLView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EAGLView.m; sourceTree = "<group>"; };
-		36793B951E68E44C00A35A93 /* SimpleVisualizationController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SimpleVisualizationController.h; sourceTree = "<group>"; };
-		36793B961E68E44C00A35A93 /* SimpleVisualizationController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = SimpleVisualizationController.mm; sourceTree = "<group>"; };
 		36939D9C1E5E6DC400F7E160 /* opencv.tut.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = opencv.tut.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		36939DA01E5E6DC400F7E160 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		36939DA21E5E6DC400F7E160 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		36939DA31E5E6DC400F7E160 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
-		36939DA51E5E6DC400F7E160 /* ViewController.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; path = ViewController.h; sourceTree = "<group>"; };
-		36939DA61E5E6DC400F7E160 /* ViewController.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ViewController.mm; sourceTree = "<group>"; };
 		36939DAB1E5E6DC400F7E160 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		36939DB01E5E6DC500F7E160 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		36939DB71E5E6DC500F7E160 /* AssetsLibrary.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AssetsLibrary.framework; path = System/Library/Frameworks/AssetsLibrary.framework; sourceTree = SDKROOT; };
@@ -111,8 +102,6 @@
 				36939DBB1E5E6DC500F7E160 /* PrefixHeader.pch */,
 				36939DA21E5E6DC400F7E160 /* AppDelegate.h */,
 				36939DA31E5E6DC400F7E160 /* AppDelegate.m */,
-				36939DA51E5E6DC400F7E160 /* ViewController.h */,
-				36939DA61E5E6DC400F7E160 /* ViewController.mm */,
 				3660FEB01E79DD25003B4907 /* SceneViewController.swift */,
 				3660FED41E7A77FA003B4907 /* OpenCVDetectorAdapter.h */,
 				3660FED51E7A77FA003B4907 /* OpenCVDetectorAdapter.mm */,
@@ -157,10 +146,6 @@
 				36E9E9DD1E667F4F00636730 /* GeometryTypes.cpp */,
 				36E9E9DE1E667F4F00636730 /* GeometryTypes.hpp */,
 				36A253721E659E1D0052F93C /* KeyPointDetector.cpp */,
-				36793B931E68E44C00A35A93 /* EAGLView.h */,
-				36793B941E68E44C00A35A93 /* EAGLView.m */,
-				36793B951E68E44C00A35A93 /* SimpleVisualizationController.h */,
-				36793B961E68E44C00A35A93 /* SimpleVisualizationController.mm */,
 				36A253731E659E1D0052F93C /* KeyPointDetector.hpp */,
 				36E9E9D71E6668BB00636730 /* Marker.cpp */,
 				36E9E9D81E6668BC00636730 /* Marker.hpp */,
@@ -242,14 +227,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				36A253741E659E1D0052F93C /* KeyPointDetector.cpp in Sources */,
-				36939DA71E5E6DC400F7E160 /* ViewController.mm in Sources */,
 				36939DA41E5E6DC400F7E160 /* AppDelegate.m in Sources */,
 				36E9E9E21E667FA900636730 /* CameraCalibration.cpp in Sources */,
 				3660FEB11E79DD25003B4907 /* SceneViewController.swift in Sources */,
-				36793B981E68E44C00A35A93 /* SimpleVisualizationController.mm in Sources */,
 				36E9E9DF1E667F4F00636730 /* GeometryTypes.cpp in Sources */,
 				36D137331E5E181900B7F1FE /* UIImage+OpenCV.mm in Sources */,
-				36793B971E68E44C00A35A93 /* EAGLView.m in Sources */,
 				36939DA11E5E6DC400F7E160 /* main.m in Sources */,
 				3660FED61E7A77FA003B4907 /* OpenCVDetectorAdapter.mm in Sources */,
 				36E9E9DB1E6668BC00636730 /* Marker.cpp in Sources */,
