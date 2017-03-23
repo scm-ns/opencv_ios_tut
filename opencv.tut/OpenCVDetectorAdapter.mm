@@ -132,13 +132,12 @@
      */
    
     /*
-        In open cv the data is stored like this : 
+        In open cv and open gl the data is stored like this :
             
         ROT | TRAN
         0   |   1
     
-     
-        In open gl + Scene kit
+        In Scene kit
      
         ROT | 0
          _    _
@@ -148,8 +147,12 @@
      
      */
     
+    openGL_transform = openGL_transform.t(); // This is necessary to convert from the column major ordering of the
+    // rotation and translation to the row major odering of the rot and tran
+    std::cout << openGL_transform << std::endl;
     
     // Copy the rotation rows
+    // Copy the first row.
     mat.m11 = openGL_transform.at<float>(0,0);
     mat.m12 = openGL_transform.at<float>(0,1);
     mat.m13 = openGL_transform.at<float>(0,2);
@@ -226,7 +229,13 @@
     AVCaptureDeviceFormat* format = self.cameraInput.device.activeFormat;
     CMFormatDescriptionRef fDesc = format.formatDescription;
     CGSize dm = CMVideoFormatDescriptionGetPresentationDimensions(fDesc, true, true);
-   
+  
+    /*
+        Check if the cx , cy , fx, fy obtained here is the same as the one
+        that is need by the camera clibration ?
+        How is this being calculated. This could be asource of error too.
+     */
+    
     float cx = float(dm.width) / 2.0;
     float cy = float(dm.height) / 2.0 ;
    
@@ -234,6 +243,7 @@
     float VFOV = ((HFOV)/cx)*cy;
     
     float fx = std::abs(float(dm.width) / (2 * tan(HFOV / 180 * float(M_PI) / 2)));
+    
     float fy = std::abs(float(dm.height) / (2 * tan(VFOV / 180 * float(M_PI) / 2)));
     
     std::cout << "Obtained Calibration " << fx << " " << fx << " " << cx << " " << cy;
@@ -253,54 +263,55 @@
 
 - (cv::Mat)buildProjectionMatrix:(Matrix33)cameraMatrix width: (int)screen_width height: (int)screen_height
 {
-    float near = 0.01;  // Near clipping distance
+    float near = 1;  // Near clipping distance
     float far  = 100;  // Far clipping distance
-    
-    // Camera parameters
-    float f_x = cameraMatrix.data[0]; // Focal length in x axis
-    float f_y = cameraMatrix.data[4]; // Focal length in y axis (usually the same?)
-    float c_x = cameraMatrix.data[2]; // Camera primary point x
-    float c_y = cameraMatrix.data[5]; // Camera primary point y
+ 
+    AVCaptureDeviceFormat* format = self.cameraInput.device.activeFormat;
   
-    // Look at the equation to create the projection matrix.
-   
-    // This is not the simple projection, this also does the scaling required to convert the objects from the
-    // camera reference frame to the image model ?
-    
-    // Storage as column major. That is along the columns. 1st column , then 2nd column etc
-    // Same as sceneKit
-    
+    float fov = format.videoFieldOfView;
+    std::cout << fov << std::endl;
+    float S = 1 / (tan(fov/2 * M_PI/180 ));
+    std::cout << S << std::endl;
     cv::Mat projectionMatrix(4,4,CV_32F);
    
-    // ANother place of possible error. The row vs col majoring issues
-    // #ERROR
-    // What is the format here for the projectoin matrices ?
-  
-    // ERROR POSSIBILITY HIGH
-    // This formula has not beed found anywhere other than the opencv book
-        // There is a high probability of being wrong here. 
+    /*
+        Use the fov directyl instead of figuring out the fx fy etc .
+        cx and cy might be causing errors for me though.
+     
+        The frustum is projected on the focal plane.
+        Which has size cx , cy
+        Then is have to converted to an image place which is what is shown on the screen.
+   
+        // ERROR
+            Can the calibration effect the rotation ?
+            cx and cy could. When I visualize it, this seems like a probablity.
+     
+     */
     
-    projectionMatrix.at<float>(0,0) = - 2.0 * f_x / screen_width;
-    projectionMatrix.at<float>(1,0) = 0.0;
+   // I am inverting the x and y axis.
+    // Not in terms of signs, but x,y = y,x
+    projectionMatrix.at<float>(0,0) = 0.0;
+    projectionMatrix.at<float>(1,0) = S;
     projectionMatrix.at<float>(2,0) = 0.0;
     projectionMatrix.at<float>(3,0) = 0.0;
    
-    projectionMatrix.at<float>(0,1) = 0.0;
-    projectionMatrix.at<float>(1,1) = 2.0 * f_y / screen_height;
+    projectionMatrix.at<float>(0,1) = S;
+    projectionMatrix.at<float>(1,1) = 0.0;
     projectionMatrix.at<float>(2,1) = 0.0;
     projectionMatrix.at<float>(3,1) = 0.0;
     
-    projectionMatrix.at<float>(0,2) = 2.0 * c_x / screen_width - 1.0;
-    projectionMatrix.at<float>(1,2) = 2.0 * c_y / screen_height - 1.0;
-    projectionMatrix.at<float>(2,2) = -( far+near ) / ( far - near );
+    projectionMatrix.at<float>(0,2) = 0;
+    projectionMatrix.at<float>(1,2) = 0;
+    projectionMatrix.at<float>(2,2) = -( far) / ( far - near );
     projectionMatrix.at<float>(3,2) = -1.0;
     
     projectionMatrix.at<float>(0,3) = 0.0;
     projectionMatrix.at<float>(1,3) = 0.0;
-    projectionMatrix.at<float>(2,3) = -2.0 * far * near / ( far - near );
+    projectionMatrix.at<float>(2,3) = -far * near / ( far - near );
     projectionMatrix.at<float>(3,3) = 0.0;
-    
-    return projectionMatrix.t(); // Scene kit only behaves properly, when this matrix is transposed.
+   
+   
+    return projectionMatrix; // Scene kit only behaves properly, when this matrix is transposed.
     // Else the x and y axis are screwed up. I spend hours due to this bug.
 }
 
