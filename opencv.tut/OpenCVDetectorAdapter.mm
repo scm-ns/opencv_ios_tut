@@ -246,7 +246,7 @@
     
     float fy = std::abs(float(dm.height) / (2 * tan(VFOV / 180 * float(M_PI) / 2)));
     
-    std::cout << "Obtained Calibration " << fx << " " << fx << " " << cx << " " << cy;
+    std::cout << "Obtained Calibration " << fx << " " << fy << " " << cx << " " << cy;
     
     return new CameraCalibration(fx , fy , cx , cy);
 }
@@ -267,13 +267,26 @@
     float far  = 100;  // Far clipping distance
  
     AVCaptureDeviceFormat* format = self.cameraInput.device.activeFormat;
-  
+    CMFormatDescriptionRef fDesc = format.formatDescription;
+    CGSize dm = CMVideoFormatDescriptionGetPresentationDimensions(fDesc, true, true);
+    
+    float cx = float(dm.width) / 2.0;
+    float cy = float(dm.height) / 2.0 ;
+    
     float fov = format.videoFieldOfView;
     std::cout << fov << std::endl;
     float S = 1 / (tan(fov/2 * M_PI/180 ));
     std::cout << S << std::endl;
     cv::Mat projectionMatrix(4,4,CV_32F);
-   
+    
+    float aspect = cx /cy;
+    float top = tan(fov/2 * M_PI/180) * near;
+    float bottom = -top;
+    float left = bottom * aspect ;
+    float right = top * aspect ;
+    
+    
+    
     /*
         Use the fov directyl instead of figuring out the fx fy etc .
         cx and cy might be causing errors for me though.
@@ -290,18 +303,18 @@
     
    // I am inverting the x and y axis.
     // Not in terms of signs, but x,y = y,x
+    projectionMatrix.at<float>(1,0) = 2*near / right - left;
     projectionMatrix.at<float>(0,0) = 0.0;
-    projectionMatrix.at<float>(1,0) = S;
     projectionMatrix.at<float>(2,0) = 0.0;
     projectionMatrix.at<float>(3,0) = 0.0;
    
-    projectionMatrix.at<float>(0,1) = S;
     projectionMatrix.at<float>(1,1) = 0.0;
+    projectionMatrix.at<float>(0,1) = 2*near / top - bottom;
     projectionMatrix.at<float>(2,1) = 0.0;
     projectionMatrix.at<float>(3,1) = 0.0;
     
-    projectionMatrix.at<float>(0,2) = 0;
-    projectionMatrix.at<float>(1,2) = 0;
+    projectionMatrix.at<float>(0,2) = right + left / (right - left);
+    projectionMatrix.at<float>(1,2) = top + bottom / (top -bottom);
     projectionMatrix.at<float>(2,2) = -( far) / ( far - near );
     projectionMatrix.at<float>(3,2) = -1.0;
     
