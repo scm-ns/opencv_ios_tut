@@ -292,7 +292,9 @@
     
     double bottom_modified = -(near / f_y) * c_y;
     double top_modified = (near/ f_y) * c_y;
-   
+ 
+    // I don't see any logical reason for this transformation
+    
 
     projectionMatrix.at<float>(1,0) = 2.0 * near / (right_modified - left_modified);
     projectionMatrix.at<float>(0,0) = 0.0;
@@ -306,16 +308,15 @@
     
     projectionMatrix.at<float>(1,2) = (right_modified + left_modified ) / (right_modified - left_modified);
     projectionMatrix.at<float>(0,2) = (top_modified + bottom_modified) / (top_modified - bottom_modified);
-    projectionMatrix.at<float>(2,2) = -( far) / ( far - near );
+    projectionMatrix.at<float>(2,2) = -( far + near ) / ( far - near );
     projectionMatrix.at<float>(3,2) = -1.0;
     
     projectionMatrix.at<float>(0,3) = 0.0;
     projectionMatrix.at<float>(1,3) = 0.0;
-    projectionMatrix.at<float>(2,3) = -far * near / ( far - near );
+    projectionMatrix.at<float>(2,3) = -2*far * near / ( far - near );
     projectionMatrix.at<float>(3,3) = 0.0;
   
-    cv::Mat ndcShiftMatrix(4,4,CV_32F);
-    std::cout << ndcShiftMatrix << std::endl;
+    cv::Mat ndcShiftMatrix = cv::Mat::zeros(4,4,CV_32F);
     
   // http://blog.athenstean.com/post/135771439196/from-opengl-to-metal-the-projection-matrix
     
@@ -324,8 +325,11 @@
     ndcShiftMatrix.at<float>(2,2) = 0.5;
     ndcShiftMatrix.at<float>(2,3) = 0.5;
     ndcShiftMatrix.at<float>(3,3) = 1;
+   
+    std::cout << "NDC" << ndcShiftMatrix << std::endl;
+    std::cout << "shift mat " << ndcShiftMatrix*projectionMatrix << std::endl;
     
-    
+    // Convet from 2x2x2 NDC of open gl to 2x2x1 NDC of metal
     return ndcShiftMatrix*projectionMatrix; // Scene kit only behaves properly, when this matrix is transposed.
     // Else the x and y axis are screwed up. I spend hours due to this bug.
 }
