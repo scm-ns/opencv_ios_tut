@@ -374,24 +374,29 @@ void KeyPointDetector::estimatePosition(std::vector<Marker>& detectedMarkers)
        
        
         // Copy to tranformation matrix. This matrix will be able to move from model coor to camera coor
+        // Docs : rotMat and TVec is actually used to transfrom from the object coordinate to the camera coor.
+                // Not the location of the camera in the model coor. So the transformations can be applied to a 
+                // model to bring it into camera coor. Keep in mind that the axises are a bit different.
         
-
+                // There is conflicting information here : Some say the axis is : up : Y , right : X , out of camra : Z(along view)
+                //                                         others say   axis is : up : X , right : Y , out of camera : Z
         viewMatrix( cv::Range(0,3) , cv::Range(0,3)) = rotMat * 1;
-
-        viewMatrix( cv::Range(0,3) , cv::Range(3,4)) = -Tvec *1;
+        
+        viewMatrix( cv::Range(0,3) , cv::Range(3,4)) = Tvec *1;
+       
         
         float *p = viewMatrix.ptr<float>(3); // Access as float instead of double
         p[0] = p[1] = p[2] = 0; p[3] = 1;
         
         // Convert to OpenGL Format
 
-        std::cout << viewMatrix << std::endl; ;
+        std::cout << " LEFT HANDED : " << viewMatrix << std::endl; ;
 
         // convert from left hand coor in opencv to right handed coor in opengl and scenekit
         cv::Mat cvToGl = cv::Mat::zeros(4, 4, CV_32F);
         cvToGl.at<float>(0, 0) = 1.0f;
-        cvToGl.at<float>(1, 1) = 1.0f; // Invert the y axis.
-        cvToGl.at<float>(2, 2) = 1.0f; // invert the z axis
+        cvToGl.at<float>(1, 1) = -1.0f; // Invert the y axis.
+        cvToGl.at<float>(2, 2) = -1.0f; // invert the z axis
         cvToGl.at<float>(3, 3) = 1.0f;
             // ERROR : POSSIBILITY
         viewMatrix = cvToGl * viewMatrix; // This is right, for what I read in open cv.
@@ -415,7 +420,7 @@ void KeyPointDetector::estimatePosition(std::vector<Marker>& detectedMarkers)
         
         m.transformation = viewMatrix;
       
-        std::cout << viewMatrix << std::endl; ;
+        std::cout << "RIGHT HANDED : " << viewMatrix << std::endl; ;
 
         
     }
