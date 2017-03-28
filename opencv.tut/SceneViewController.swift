@@ -82,11 +82,11 @@ class SceneViewController: UIViewController
         
         self.setupSceneKitView()
         self.positionSceneKitCamera()
-        self.loadSceneNodes()
+    //    self.loadSceneNodes()
         
         //self.cameraProcessQeueu.async
        // {
-                self.cameraSession?.startRunning()
+               self.cameraSession?.startRunning()
         //}
     }
 
@@ -119,17 +119,43 @@ class SceneViewController: UIViewController
       
             // This is the most important step that was missed.
             // Without setting this property, the projection matrix of the camera node is not used.
+     
+           // self.cameraNode.position = SCNVector3Make(-2.5995512, 1.49546146, -4.97159767)
+            //self.cameraNode.rotation  = SCNVector4Make(-0.133915573, 0.990561962, 0.0292183589, 3.63054442)
+       // (0, 1, 0, Float(20.degreesToRadians))  // SCNVector4Make(0, 0, 1, Float(-180.degreesToRadians))
         
+            self.sceneView?.scene?.rootNode.addChildNode(self.cameraNode)
             self.sceneView?.pointOfView = self.cameraNode  // I should have read more from the docs
+        
+            print("Root Node")
+            printNodeProperty(node: (self.sceneView?.scene?.rootNode)!)
+        
             self.sceneView?.debugOptions = .showBoundingBoxes
+           self.sceneView?.autoenablesDefaultLighting = true
+        
+            print("Camera Node")
+            printNodeProperty(node: self.cameraNode)
+        
             print("FOVx : \(self.cameraNode.camera?.xFov)")
             print("FOVx : \(self.cameraNode.camera?.yFov)")
             print("FOVx : \(self.cameraNode.camera?.zNear)")
             print("FOVx : \(self.cameraNode.camera?.zFar)")
        
             self.sceneView?.allowsCameraControl = true
+            let boxGeometry = SCNBox(width: 0.3, height: 0.3, length: 0.3, chamferRadius: 0.0)
+            boxGeometry.firstMaterial!.diffuse.contents = UIColor.red
+            boxGeometry.firstMaterial!.specular.contents = UIColor.white
+            let boxNode = SCNNode(geometry: boxGeometry)
+            boxNode.position = SCNVector3Make(0, 0, -5)
+            scene.rootNode.addChildNode(boxNode)
        
-        
+            let myLight = SCNLight()
+            let myLightNode = SCNNode()
+            myLight.type = SCNLight.LightType.omni
+            myLight.color = UIColor.yellow
+            myLightNode.light = myLight
+            myLightNode.position = SCNVector3(-1.94764662, -0.0102603436, 5.74969292)
+            scene.rootNode.addChildNode(myLightNode)
         
         
             // ERROR :
@@ -211,6 +237,7 @@ class SceneViewController: UIViewController
             self.sceneView?.delegate = self
             self.sceneView?.play(nil)
             self.sceneView?.backgroundColor = UIColor.clear
+            self.sceneView?.contentMode = .scaleAspectFit
             self.view.addSubview(self.sceneView!)
     }
  
@@ -231,19 +258,17 @@ extension SceneViewController : SCNSceneRendererDelegate
     */
     func renderer(_ renderer: SCNSceneRenderer, updateAtTime time: TimeInterval)
     {
-        var itemCopy : SCNNode?
       
-        guard let item = self.itemNode else
-        {
-           return
-        }
-       
         // Remove all the previously drawn items
         // Inefficient work on
         for node in self.scene.rootNode.childNodes
         {
-            node.removeFromParentNode()
+            if node.name == "temp"
+            {
+                node.removeFromParentNode()
+            }
         }
+     
         
         for transform in self.nodeTransforms // If items have been identified. Then place an object on top of it.
         {
@@ -254,11 +279,19 @@ extension SceneViewController : SCNSceneRendererDelegate
             
             let boxGeometry = SCNPyramid()
             let boxNode = SCNNode(geometry: boxGeometry)
-            boxNode.transform = transform
-            scene.rootNode.addChildNode(boxNode)
+            boxNode.name = "temp"
+            print("Model : ")
+            self.printNodeProperty(node: boxNode)
             
+            boxNode.transform = transform
+            print("View Model : ")
+            self.printNodeProperty(node: boxNode)
             
             //boxNode.transform = SCNMatrix4Invert(transform) // This invert is not needed as this is done in the
+            //boxNode.transform = SCNMatrix4Rotate(transform, Float.pi/7.0 , 1, 0, 0)
+            
+            scene.rootNode.addChildNode(boxNode)
+            
             //itemCopy?.transform = transform
             // POSSIBLE ERRORS :
             
@@ -292,8 +325,24 @@ extension SceneViewController : SCNSceneRendererDelegate
         }
         
         //print("Rendering")
-    }
+        print("Camera Point of View")
+        printNodeProperty(node: (self.sceneView?.pointOfView)!)
        
+        print("Camera Node : ")
+        printNodeProperty(node: self.cameraNode)
+        
+    }
+    
+    func printNodeProperty(node : SCNNode)
+    {
+        print("poition : \(node.position)")
+        print("rotation : \(node.rotation)")
+        return
+        print("Orientation :\(node.orientation)")
+        print("transform : \(node.transform)")
+        print("W transform : \(node.worldTransform)")
+        print("Pivot : \(node.pivot))")
+    }
 }
 
 
@@ -560,3 +609,10 @@ extension SceneViewController : TransformAcceptorDelegate
                             b) The inverse relationship between the data formats
  */
 
+extension Int {
+    var degreesToRadians: Double { return Double(self) * .pi / 180 }
+}
+extension FloatingPoint {
+    var degreesToRadians: Self { return self * .pi / 180 }
+    var radiansToDegrees: Self { return self * 180 / .pi }
+}
