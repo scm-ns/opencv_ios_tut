@@ -412,8 +412,8 @@ void KeyPointDetector::estimatePosition(std::vector<Marker>& detectedMarkers)
 
         // convert from left hand coor in opencv to right handed coor in opengl and scenekit
         cv::Mat cvToGl = cv::Mat::zeros(4, 4, CV_32F);
-        cvToGl.at<float>(0, 0) = 1.0f;
-        cvToGl.at<float>(1, 1) = -1.0f; // Invert the y axis.
+        cvToGl.at<float>(0, 1) = 1.0f;
+        cvToGl.at<float>(1, 0) = -1.0f; // Invert the y axis.
         cvToGl.at<float>(2, 2) = -1.0f; // invert the z axis
         cvToGl.at<float>(3, 3) = 1.0f;
             // ERROR : POSSIBILITY
@@ -424,15 +424,12 @@ void KeyPointDetector::estimatePosition(std::vector<Marker>& detectedMarkers)
         
             How do I invert the axis ? How to make sure that this transformation
             is done properly ?
-         
         
             In the old way of using open gl directly. I was not inverting the axis.
             But I might have been handling it in the projection matrix.
        
             Other things to keep in mind.
         
-         
-         
          */
         
         

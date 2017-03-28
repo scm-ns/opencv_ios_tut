@@ -122,10 +122,14 @@ class SceneViewController: UIViewController
      
            // self.cameraNode.position = SCNVector3Make(-2.5995512, 1.49546146, -4.97159767)
             //self.cameraNode.rotation  = SCNVector4Make(-0.133915573, 0.990561962, 0.0292183589, 3.63054442)
-       // (0, 1, 0, Float(20.degreesToRadians))  // SCNVector4Make(0, 0, 1, Float(-180.degreesToRadians))
+        
+            self.cameraNode.eulerAngles = SCNVector3Make(0 , 0 , Float(90.degreesToRadians))
+            self.cameraNode.position = SCNVector3Make(1, -1, 2)
         
             self.sceneView?.scene?.rootNode.addChildNode(self.cameraNode)
             self.sceneView?.pointOfView = self.cameraNode  // I should have read more from the docs
+      
+        
         
             print("Root Node")
             printNodeProperty(node: (self.sceneView?.scene?.rootNode)!)
@@ -150,7 +154,7 @@ class SceneViewController: UIViewController
             scene.rootNode.addChildNode(boxNode)
       
             // add animation to box node
-            boxNode.runAction(SCNAction.repeatForever(SCNAction.rotateBy(x: CGFloat(90.degreesToRadians), y: CGFloat(90.degreesToRadians), z: CGFloat(90.degreesToRadians), duration: 3)))
+            boxNode.runAction(SCNAction.repeatForever(SCNAction.rotateBy(x: CGFloat(90.degreesToRadians), y: CGFloat(0.degreesToRadians), z: CGFloat(0.degreesToRadians), duration: 3)))
         
             let myLight = SCNLight()
             let myLightNode = SCNNode()
@@ -293,7 +297,7 @@ extension SceneViewController : SCNSceneRendererDelegate
             self.printNodeProperty(node: boxNode)
             
             boxNode.transform = transform
-         //  boxNode.eulerAngles = SCNVector3Make(0, 0, -(Float)(90.degreesToRadians) )
+            boxNode.eulerAngles = SCNVector3Make(-(Float)(90.degreesToRadians),0 , 0)
            // boxNode.transform = SCNMatrix4Rotate(boxNode.transform, Float(10.degreesToRadians) , 0, 1, 1)
             
             print("View Model : ")
