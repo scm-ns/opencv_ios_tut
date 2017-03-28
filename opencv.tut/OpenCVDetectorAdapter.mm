@@ -236,15 +236,10 @@
         How is this being calculated. This could be asource of error too.
      */
     
-    float cx = float(dm.width) / 2.0;
-    float cy = float(dm.height) / 2.0 ;
-   
-    float HFOV = format.videoFieldOfView;
-    float VFOV = ((HFOV)/cx)*cy;
-    
-    float fx = std::abs(float(dm.width) / (2 * tan(HFOV / 180 * float(M_PI) / 2)));
-    
-    float fy = std::abs(float(dm.height) / (2 * tan(VFOV / 180 * float(M_PI) / 2)));
+    double fx = 1.1072782183366783e+03;
+    double fy = 1.0849198430596782e+03;
+    double cx = 5.5150736004400665e+02;
+    double cy = 3.4412221680732574e+02;
     
     std::cout << "Obtained Calibration " << fx << " " << fy << " " << cx << " " << cy;
     
@@ -265,28 +260,16 @@
 {
     float near = 1;  // Near clipping distance
     float far  = 100;  // Far clipping distance
- 
-    AVCaptureDeviceFormat* format = self.cameraInput.device.activeFormat;
-    CMFormatDescriptionRef fDesc = format.formatDescription;
-    CGSize dm = CMVideoFormatDescriptionGetPresentationDimensions(fDesc, true, true);
+
     
-    float cx = float(dm.width) / 2.0;
-    float cy = float(dm.height) / 2.0 ;
     
-    float fov = format.videoFieldOfView;
-    std::cout << fov << std::endl;
-    float S = 1 / (tan(fov/2 * M_PI/180 ));
-    std::cout << S << std::endl;
+    // Camera parameters
+    float f_x = cameraMatrix.data[0]; // Focal length in x axis
+    float f_y = cameraMatrix.data[4]; // Focal length in y axis (usually the same?)
+    float c_x = cameraMatrix.data[2]; // Camera primary point x
+    float c_y = cameraMatrix.data[5]; // Camera primary point y
+    
     cv::Mat projectionMatrix(4,4,CV_32F);
-    
-    float aspect = cx /cy;
-    float top = tan(fov/2 * M_PI/180) * near;
-    float bottom = -top;
-    float left = bottom * aspect ;
-    float right = top * aspect ;
-    
-    
-    
     /*
         Use the fov directyl instead of figuring out the fx fy etc .
         cx and cy might be causing errors for me though.
@@ -303,18 +286,26 @@
     
    // I am inverting the x and y axis.
     // Not in terms of signs, but x,y = y,x
-    projectionMatrix.at<float>(1,0) = 2*near / right - left;
+    
+    double left_modified = -(near / f_x)*c_x;
+    double right_modified = (near / f_x)*c_x;
+    
+    double bottom_modified = -(near / f_y) * c_y;
+    double top_modified = (near/ f_y) * c_y;
+   
+
+    projectionMatrix.at<float>(1,0) = 2.0 * near / (right_modified - left_modified);
     projectionMatrix.at<float>(0,0) = 0.0;
     projectionMatrix.at<float>(2,0) = 0.0;
     projectionMatrix.at<float>(3,0) = 0.0;
    
     projectionMatrix.at<float>(1,1) = 0.0;
-    projectionMatrix.at<float>(0,1) = 2*near / top - bottom;
+    projectionMatrix.at<float>(0,1) = 2.0 * near / (top_modified - bottom_modified);
     projectionMatrix.at<float>(2,1) = 0.0;
     projectionMatrix.at<float>(3,1) = 0.0;
     
-    projectionMatrix.at<float>(0,2) = right + left / (right - left);
-    projectionMatrix.at<float>(1,2) = top + bottom / (top -bottom);
+    projectionMatrix.at<float>(1,2) = (right_modified + left_modified ) / (right_modified - left_modified);
+    projectionMatrix.at<float>(0,2) = (top_modified + bottom_modified) / (top_modified - bottom_modified);
     projectionMatrix.at<float>(2,2) = -( far) / ( far - near );
     projectionMatrix.at<float>(3,2) = -1.0;
     
@@ -322,9 +313,20 @@
     projectionMatrix.at<float>(1,3) = 0.0;
     projectionMatrix.at<float>(2,3) = -far * near / ( far - near );
     projectionMatrix.at<float>(3,3) = 0.0;
-   
-   
-    return projectionMatrix; // Scene kit only behaves properly, when this matrix is transposed.
+  
+    cv::Mat ndcShiftMatrix(4,4,CV_32F);
+    std::cout << ndcShiftMatrix << std::endl;
+    
+  // http://blog.athenstean.com/post/135771439196/from-opengl-to-metal-the-projection-matrix
+    
+    ndcShiftMatrix.at<float>(0,0) = 1;
+    ndcShiftMatrix.at<float>(1,1) = 1;
+    ndcShiftMatrix.at<float>(2,2) = 0.5;
+    ndcShiftMatrix.at<float>(2,3) = 0.5;
+    ndcShiftMatrix.at<float>(3,3) = 1;
+    
+    
+    return ndcShiftMatrix*projectionMatrix; // Scene kit only behaves properly, when this matrix is transposed.
     // Else the x and y axis are screwed up. I spend hours due to this bug.
 }
 
