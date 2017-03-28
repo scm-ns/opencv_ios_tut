@@ -44,24 +44,42 @@ KeyPointDetector::KeyPointDetector(CameraCalibration calibration)
     cv::Mat(3,3, CV_32F, const_cast<float*>(&calibration.getIntrinsic().data[0])).copyTo(camMatrix);
     cv::Mat(4,1, CV_32F, const_cast<float*>(&calibration.getDistorsion().data[0])).copyTo(distCoeff);
 
-    bool centerOrigin = true;
-    if (centerOrigin)
-    {
-        // In which coordinate space ? In the device normalized space
-        // How does that have enough information to do the conversion ?
-        m_markerCorners3d.push_back(cv::Point3f(-0.5f,-0.5f,0));
-        m_markerCorners3d.push_back(cv::Point3f(+0.5f,-0.5f,0));
-        m_markerCorners3d.push_back(cv::Point3f(+0.5f,+0.5f,0));
-        m_markerCorners3d.push_back(cv::Point3f(-0.5f,+0.5f,0));
-    }
-    else
-    {
-        m_markerCorners3d.push_back(cv::Point3f(0,0,0));
-        m_markerCorners3d.push_back(cv::Point3f(1,0,0));
-        m_markerCorners3d.push_back(cv::Point3f(1,1,0));
-        m_markerCorners3d.push_back(cv::Point3f(0,1,0));    
-    }
-
+    // I am operating in two different world coordinates here.
+    // The world coordinate for open-cv. It is in this world coordinate that I find the Rvec and TVec using solve pnp.
+    // The world coordiantes for metal, used by scene-kit.
+    // I need to make sure that they line up.
+   
+    /*
+     // clock wise odering : Open CV
+                000         100                  ------ X
+                                                |
+                                                |
+                                                |
+                010         110
+                                                Y
+        counter clockwise odering  : Metal
+        
+                                                Y
+                -110          110               |
+                                                |
+                                                |
+                         000                     ----- X
+     
+     
+                 -1-10         1-10
+     
+     
+        How to force open cv to use the same coordinate system as metal ? 
+     */
+    
+    // Used by solve pnp
+    m_markerCorners3d.push_back(cv::Point3f(-1,1,0));
+    m_markerCorners3d.push_back(cv::Point3f(1,1,0));
+    m_markerCorners3d.push_back(cv::Point3f(1,-1,0));
+    m_markerCorners3d.push_back(cv::Point3f(-1,-1,0));
+    
+    // used to find the points of the marker. Not important for the projection and transform.
+    // This is important only with the opencv coordinate system 
     m_markerCorners2d.push_back(cv::Point2f(0,0));
     m_markerCorners2d.push_back(cv::Point2f(markerSize.width-1,0));
     m_markerCorners2d.push_back(cv::Point2f(markerSize.width-1,markerSize.height-1));
