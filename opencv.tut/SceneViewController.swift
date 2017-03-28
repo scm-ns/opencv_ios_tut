@@ -141,14 +141,17 @@ class SceneViewController: UIViewController
             print("FOVx : \(self.cameraNode.camera?.zNear)")
             print("FOVx : \(self.cameraNode.camera?.zFar)")
        
-            self.sceneView?.allowsCameraControl = true
+            //self.sceneView?.allowsCameraControl = true
             let boxGeometry = SCNBox(width: 0.3, height: 0.3, length: 0.3, chamferRadius: 0.0)
             boxGeometry.firstMaterial!.diffuse.contents = UIColor.red
             boxGeometry.firstMaterial!.specular.contents = UIColor.white
             let boxNode = SCNNode(geometry: boxGeometry)
             boxNode.position = SCNVector3Make(0, 0, -5)
             scene.rootNode.addChildNode(boxNode)
-       
+      
+            // add animation to box node
+            boxNode.runAction(SCNAction.repeatForever(SCNAction.rotateBy(x: CGFloat(90.degreesToRadians), y: CGFloat(90.degreesToRadians), z: CGFloat(90.degreesToRadians), duration: 3)))
+        
             let myLight = SCNLight()
             let myLightNode = SCNNode()
             myLight.type = SCNLight.LightType.omni
@@ -157,6 +160,12 @@ class SceneViewController: UIViewController
             myLightNode.position = SCNVector3(-1.94764662, -0.0102603436, 5.74969292)
             scene.rootNode.addChildNode(myLightNode)
         
+       
+            let ambientLightNode = SCNNode()
+            ambientLightNode.light = SCNLight()
+            ambientLightNode.light!.type = .ambient
+            ambientLightNode.light!.color = UIColor.white
+            scene.rootNode.addChildNode(ambientLightNode)
         
             // ERROR :
                 /*
@@ -284,6 +293,9 @@ extension SceneViewController : SCNSceneRendererDelegate
             self.printNodeProperty(node: boxNode)
             
             boxNode.transform = transform
+         //  boxNode.eulerAngles = SCNVector3Make(0, 0, -(Float)(90.degreesToRadians) )
+           // boxNode.transform = SCNMatrix4Rotate(boxNode.transform, Float(10.degreesToRadians) , 0, 1, 1)
+            
             print("View Model : ")
             self.printNodeProperty(node: boxNode)
             
