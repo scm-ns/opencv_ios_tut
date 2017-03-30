@@ -81,13 +81,10 @@ class SceneViewController: UIViewController
         featureDetector = OpenCVDetectorAdapter(acceptor: self, cameraInput: self.cameraInput!)
         
         self.setupSceneKitView()
-        self.positionSceneKitCamera()
-    //    self.loadSceneNodes()
+        self.setupSceneKitCamera()
+        self.setupLights()
         
-        //self.cameraProcessQeueu.async
-       // {
-               self.cameraSession?.startRunning()
-        //}
+        self.cameraSession?.startRunning()
     }
 
     /*
@@ -160,9 +157,10 @@ class SceneViewController: UIViewController
             print("ERROR : failed to load node")
         }
     }
+   
+
     
-    
-    func positionSceneKitCamera()
+    func setupSceneKitCamera()
     {
             self.cameraNode.camera = SCNCamera()
             self.setupPrespectiveTranformInSceneKit()
@@ -188,6 +186,11 @@ class SceneViewController: UIViewController
             // add animation to box node
             boxNode.runAction(SCNAction.repeatForever(SCNAction.rotateBy(x: CGFloat(90.degreesToRadians), y: CGFloat(0.degreesToRadians), z: CGFloat(0.degreesToRadians), duration: 3)))
             */
+       
+    }
+   
+    func setupLights()
+    {
         
             // Add lights without them the object will not show up
             let myLight = SCNLight()
@@ -206,6 +209,7 @@ class SceneViewController: UIViewController
             scene.rootNode.addChildNode(ambientLightNode)
         
     }
+    
     
     func setupSceneKitView()
     {
@@ -293,8 +297,6 @@ extension SceneViewController : AVCaptureVideoDataOutputSampleBufferDelegate
     */
     func setupCameraCapture() 
     {
-    //        self.cameraProcessQeueu.async
-     //       {
                 let backCamera = AVCaptureDevice.defaultDevice(withDeviceType: .builtInWideAngleCamera, mediaType: AVMediaTypeVideo, position: .back)
                 
                 guard backCamera != nil else

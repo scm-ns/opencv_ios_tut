@@ -91,8 +91,6 @@
         // added to a serial queue, so that after the processing is done in the earlier block (detectFeatures
         // and values are obtained.) this block is exectued which will pass the transforms to the accpetor
     
-      //  dispatch_async(serialQueue,
-      // ^{
            // Obtain the tranforms can pass it back to the source using acceptor delegate
             std::vector<cv::Mat> transforms = _detector->getTransformations();
 
@@ -101,7 +99,7 @@
            
            NSMutableArray* array = [[NSMutableArray alloc] init];
            
-        for( cv::Mat& transform : transforms)
+           for( cv::Mat& transform : transforms)
            {
                SCNMatrix4 sceneKitTransform = [self transformToSceneKit:transform];
                // NSArray cannot hold a struct, so wrap it in an NSValue and do the inverse at the acceptor (swift) side
@@ -110,7 +108,6 @@
          
            // Pass it back to the source 
            [self.acceptor acceptTransforms:[NSArray arrayWithArray:array]];
-    //   });
 }
 
 -(SCNMatrix4) transformToSceneKit:(cv::Mat&) openGL_transform  // This matrix is in the opengl format
