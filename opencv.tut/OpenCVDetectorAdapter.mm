@@ -76,9 +76,7 @@
 
         dispatch_async(serialQueue,
         ^{
-            // Detect the different transforms . THINK : Make the method asyn or something like that ?
             _detector->processFrame(bgraMat);
-           
             [self passTransformsBack];
          });
 
@@ -87,7 +85,6 @@
 /*
     Process the image, find the markers. Identify the transforms of those markers and then, pass it back to the source, using
     the acceptor delegate
- 
  */
 -(void)passTransformsBack
 {
@@ -119,17 +116,8 @@
 -(SCNMatrix4) transformToSceneKit:(cv::Mat&) openGL_transform  // This matrix is in the opengl format
 {
     SCNMatrix4 mat = SCNMatrix4Identity;
-    // Place of possible error : The formats might not be handled properly yet. Read more about Apple docs
-
-    // Scene Kit is row major. How to handle that ?
-  
-    /*
-        But why does the memory odering ever matter. Yes the data will be stored differntly in either
-        strucutres but we are not accessing memory directly, but using index access and that should
-        make the memory order irrelavent
-     
-        So the odering does not seem to be something that I need to worry about
-     */
+    
+    // Scene Kit is row major.
    
     /*
         In open cv and open gl the data is stored like this :
@@ -147,9 +135,10 @@
      
      */
     
-    openGL_transform = openGL_transform.t(); // This is necessary to convert from the column major ordering of the
+    openGL_transform = openGL_transform.t();
+    // This is necessary to convert from the column major ordering of the
     // rotation and translation to the row major odering of the rot and tran
-    std::cout << openGL_transform << std::endl;
+    
     
     // Copy the rotation rows
     // Copy the first row.
@@ -213,7 +202,6 @@
 -(void) setScreenProperties:(int)width height:(int)height
 {
    
-    // the camera calibraion required the width and height
     _screenWidth = width;
     _screenHeight = height;
     
@@ -224,24 +212,12 @@
 
 -(CameraCalibration*) createCameraCalibration
 {
-    // #ERROR Is there errors here that I need to worry ABOUT ?
-    
-    AVCaptureDeviceFormat* format = self.cameraInput.device.activeFormat;
-    CMFormatDescriptionRef fDesc = format.formatDescription;
-    CGSize dm = CMVideoFormatDescriptionGetPresentationDimensions(fDesc, true, true);
-  
-    /*
-        Check if the cx , cy , fx, fy obtained here is the same as the one
-        that is need by the camera clibration ?
-        How is this being calculated. This could be asource of error too.
-     */
-    
+    // Parameters obtained from the yaml file from running the calibration on iPHONE 5S ONLY. For other camera's run the calibration again
+    // I have some uncertainity in whether the parameters are accurate enough.
     double fx = 1.1072782183366783e+03;
     double fy = 1.0849198430596782e+03;
     double cx = 5.5150736004400665e+02;
     double cy = 3.4412221680732574e+02;
-    
-    std::cout << "Obtained Calibration " << fx << " " << fy << " " << cx << " " << cy;
     
     return new CameraCalibration(fx , fy , cx , cy);
 }
@@ -255,46 +231,28 @@
             Creates the matrix required to do the conversion from the 3D camera coor to the 2D camera coor
             Used as a utiliy function, not exposed to other classes
  */
-
 - (cv::Mat)buildProjectionMatrix:(Matrix33)cameraMatrix width: (int)screen_width height: (int)screen_height
 {
     float near = 1;  // Near clipping distance
     float far  = 100;  // Far clipping distance
 
     
-    
     // Camera parameters
     float f_x = cameraMatrix.data[0]; // Focal length in x axis
-    float f_y = cameraMatrix.data[4]; // Focal length in y axis (usually the same?)
+    float f_y = cameraMatrix.data[4]; // Focal length in y axis
     float c_x = cameraMatrix.data[2]; // Camera primary point x
     float c_y = cameraMatrix.data[5]; // Camera primary point y
     
     cv::Mat projectionMatrix(4,4,CV_32F);
-    /*
-        Use the fov directyl instead of figuring out the fx fy etc .
-        cx and cy might be causing errors for me though.
-     
-        The frustum is projected on the focal plane.
-        Which has size cx , cy
-        Then is have to converted to an image place which is what is shown on the screen.
-   
-        // ERROR
-            Can the calibration effect the rotation ?
-            cx and cy could. When I visualize it, this seems like a probablity.
-     
-     */
     
-   // I am inverting the x and y axis.
-    // Not in terms of signs, but x,y = y,x
+    // I am inverting the x and y axis.
+    // Not in terms of signs, but x,y = y,x // I don't know why this works.
     
     double left_modified = -(near / f_x)*c_x;
     double right_modified = (near / f_x)*c_x;
     
     double bottom_modified = -(near / f_y) * c_y;
     double top_modified = (near/ f_y) * c_y;
- 
-    // I don't see any logical reason for this transformation
-    
 
     projectionMatrix.at<float>(1,0) = 2.0 * near / (right_modified - left_modified);
     projectionMatrix.at<float>(0,0) = 0.0;
@@ -330,8 +288,7 @@
     std::cout << "shift mat " << ndcShiftMatrix*projectionMatrix << std::endl;
     
     // Convet from 2x2x2 NDC of open gl to 2x2x1 NDC of metal
-    return ndcShiftMatrix*projectionMatrix; // Scene kit only behaves properly, when this matrix is transposed.
-    // Else the x and y axis are screwed up. I spend hours due to this bug.
+    return ndcShiftMatrix*projectionMatrix;
 }
 
 

@@ -110,77 +110,10 @@ class SceneViewController: UIViewController
             self.featureDetector.setScreenProperties(Int32(self.view.bounds.width), height: Int32(self.view.bounds.height))
         
             let prespectiveTransform = self.featureDetector.getPrespectiveSCNMatrix4()
-        
-            print("PRESPECTIVE TRANSFORM BEFORE :\(self.cameraNode.camera?.projectionTransform)")
-            // The formats seem to be alright. Where could be error source be then ?
+       
+            // Make sure that the prespective transform is set properly. Else, the 2D image might not even show up.
             self.cameraNode.camera?.projectionTransform = prespectiveTransform
-        
-            print("PRESPECTIVE TRANSFORM AFTER :\(self.cameraNode.camera?.projectionTransform)")
-      
-            // This is the most important step that was missed.
-            // Without setting this property, the projection matrix of the camera node is not used.
      
-           // self.cameraNode.position = SCNVector3Make(-2.5995512, 1.49546146, -4.97159767)
-            //self.cameraNode.rotation  = SCNVector4Make(-0.133915573, 0.990561962, 0.0292183589, 3.63054442)
-        
-            self.cameraNode.eulerAngles = SCNVector3Make(0 , 0 , Float(90.degreesToRadians))
-            self.cameraNode.position = SCNVector3Make(1, -1, 2)
-        
-            self.sceneView?.scene?.rootNode.addChildNode(self.cameraNode)
-            self.sceneView?.pointOfView = self.cameraNode  // I should have read more from the docs
-      
-        
-        
-            print("Root Node")
-            printNodeProperty(node: (self.sceneView?.scene?.rootNode)!)
-        
-            self.sceneView?.debugOptions = .showBoundingBoxes
-           self.sceneView?.autoenablesDefaultLighting = true
-        
-            print("Camera Node")
-            printNodeProperty(node: self.cameraNode)
-        
-            print("FOVx : \(self.cameraNode.camera?.xFov)")
-            print("FOVx : \(self.cameraNode.camera?.yFov)")
-            print("FOVx : \(self.cameraNode.camera?.zNear)")
-            print("FOVx : \(self.cameraNode.camera?.zFar)")
-       
-            //self.sceneView?.allowsCameraControl = true
-            let boxGeometry = SCNBox(width: 0.3, height: 0.3, length: 0.3, chamferRadius: 0.0)
-            boxGeometry.firstMaterial!.diffuse.contents = UIColor.red
-            boxGeometry.firstMaterial!.specular.contents = UIColor.white
-            let boxNode = SCNNode(geometry: boxGeometry)
-            boxNode.position = SCNVector3Make(0, 0, -5)
-            scene.rootNode.addChildNode(boxNode)
-      
-            // add animation to box node
-            boxNode.runAction(SCNAction.repeatForever(SCNAction.rotateBy(x: CGFloat(90.degreesToRadians), y: CGFloat(0.degreesToRadians), z: CGFloat(0.degreesToRadians), duration: 3)))
-        
-            let myLight = SCNLight()
-            let myLightNode = SCNNode()
-            myLight.type = SCNLight.LightType.omni
-            myLight.color = UIColor.yellow
-            myLightNode.light = myLight
-            myLightNode.position = SCNVector3(-1.94764662, -0.0102603436, 5.74969292)
-            scene.rootNode.addChildNode(myLightNode)
-        
-       
-            let ambientLightNode = SCNNode()
-            ambientLightNode.light = SCNLight()
-            ambientLightNode.light!.type = .ambient
-            ambientLightNode.light!.color = UIColor.white
-            scene.rootNode.addChildNode(ambientLightNode)
-        
-            // ERROR :
-                /*
-                    Is the format of the prepecitve tranform correct ? What is apples default prespective tranform ?
-                    TO DO : Compare the tranform that is default and the one that I set see what hte differences are ?
-                */
-        
-        
-           // let angleInRad : Float = Float(90 * M_PI)/180.0
-           // self.cameraNode.camera?.projectionTransform = SCNMatrix4Rotate(prespectiveTransform, 1, 1, 0, angleInRad);
-        
     }
     
    
@@ -231,15 +164,47 @@ class SceneViewController: UIViewController
     
     func positionSceneKitCamera()
     {
-        self.cameraNode.camera = SCNCamera()
+            self.cameraNode.camera = SCNCamera()
+            self.setupPrespectiveTranformInSceneKit()
         
-        // THINK : How to transform the cameraNode properly to handle the calibrations and camera coordinate transforms
-        print(self.cameraNode.camera?.projectionTransform ?? "WE")
-
-        self.setupPrespectiveTranformInSceneKit()
-        //self.scene.rootNode.addChildNode(self.cameraNode)
+            // Rotating and positioning the camera so that the model is properly oriented.
+            self.cameraNode.eulerAngles = SCNVector3Make(0 , 0 , Float(90.degreesToRadians))
+            self.cameraNode.position = SCNVector3Make(1, -1, 2)
         
-        print(self.cameraNode.camera?.projectionTransform ?? "WE")
+            self.sceneView?.scene?.rootNode.addChildNode(self.cameraNode)
+            self.sceneView?.pointOfView = self.cameraNode  // Without setting this property, the camera and its prespective is not used.
+      
+            self.sceneView?.autoenablesDefaultLighting = true
+       
+            /*
+            // USED FOR DEBUGGING AND ORITENTING THE AXIS
+            let boxGeometry = SCNBox(width: 0.3, height: 0.3, length: 0.3, chamferRadius: 0.0)
+            boxGeometry.firstMaterial!.diffuse.contents = UIColor.red
+            boxGeometry.firstMaterial!.specular.contents = UIColor.white
+            let boxNode = SCNNode(geometry: boxGeometry)
+            boxNode.position = SCNVector3Make(0, 0, -5)
+            scene.rootNode.addChildNode(boxNode)
+      
+            // add animation to box node
+            boxNode.runAction(SCNAction.repeatForever(SCNAction.rotateBy(x: CGFloat(90.degreesToRadians), y: CGFloat(0.degreesToRadians), z: CGFloat(0.degreesToRadians), duration: 3)))
+            */
+        
+            // Add lights without them the object will not show up
+            let myLight = SCNLight()
+            let myLightNode = SCNNode()
+            myLight.type = SCNLight.LightType.omni
+            myLight.color = UIColor.yellow
+            myLightNode.light = myLight
+            myLightNode.position = SCNVector3(-1.94764662, -0.0102603436, 5.74969292)
+            scene.rootNode.addChildNode(myLightNode)
+        
+       
+            let ambientLightNode = SCNNode()
+            ambientLightNode.light = SCNLight()
+            ambientLightNode.light!.type = .ambient
+            ambientLightNode.light!.color = UIColor.white
+            scene.rootNode.addChildNode(ambientLightNode)
+        
     }
     
     func setupSceneKitView()
@@ -282,70 +247,19 @@ extension SceneViewController : SCNSceneRendererDelegate
             }
         }
      
-        
         for transform in self.nodeTransforms // If items have been identified. Then place an object on top of it.
         {
-           // itemCopy = item.clone() // Copy the 3D model so that we can have mulitple models if there are multiple makers
-           
-            
             // Position the model in the right location in the 3D camera coor
             
             let boxGeometry = SCNPyramid()
             let boxNode = SCNNode(geometry: boxGeometry)
             boxNode.name = "temp"
-            print("Model : ")
-            self.printNodeProperty(node: boxNode)
             
             boxNode.transform = transform
             boxNode.eulerAngles = SCNVector3Make(-(Float)(90.degreesToRadians),0 , 0)
-           // boxNode.transform = SCNMatrix4Rotate(boxNode.transform, Float(10.degreesToRadians) , 0, 1, 1)
-            
-            print("View Model : ")
-            self.printNodeProperty(node: boxNode)
-            
-            //boxNode.transform = SCNMatrix4Invert(transform) // This invert is not needed as this is done in the
-            //boxNode.transform = SCNMatrix4Rotate(transform, Float.pi/7.0 , 1, 0, 0)
             
             scene.rootNode.addChildNode(boxNode)
-            
-            //itemCopy?.transform = transform
-            // POSSIBLE ERRORS :
-            
-            //  1) Should this transform be applied at the camera node. I see examples where this is done
-                    /* Ans :
-                            No real answer, but in that example the rendering was done in a different manner. Does that 
-                            have any significance. It was a vuforia scene kit example.
-                    */
-            
-            //  2) The tranform is applied relative to root node. What significance does this have ? Will the root node have
-                        // a different transform ?
-            //  3) Does this make logical sense ?
-                    /* Ans :
-             
-                        I am applying a transform used to move the model from NDC to camera coor to the transform property of the node.
-                        That makes sense. A thing to worry about is that the transform is applied realive to the parent node,
-                        so this could be an error source.
-                    */
-            
-            
-           // itemCopy?.transform = SCNMatrix4Invert(transform) // This invert is not needed as this is done in the
-            // Keypoint side. To convert from opencv to opengl
-           
-            //itemCopy?.transform = SCNMatrix4Scale((itemCopy?.transform)!, 0.5, 0.5, 0.5)
-            
-            //print("TRANSFOMR : \(transform)")
-            
-            // TO DO : Remove the nodes from scene, else system slows down due to a large number of nodes
-            //self.scene.rootNode.addChildNode(itemCopy!) // where to remove
-            //print("draw item ")
         }
-        
-        //print("Rendering")
-        print("Camera Point of View")
-        printNodeProperty(node: (self.sceneView?.pointOfView)!)
-       
-        print("Camera Node : ")
-        printNodeProperty(node: self.cameraNode)
         
     }
     

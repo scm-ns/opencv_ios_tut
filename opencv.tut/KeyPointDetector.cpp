@@ -370,45 +370,36 @@ void KeyPointDetector::estimatePosition(std::vector<Marker>& detectedMarkers)
         cv::Mat Rvec;
         cv::Mat_<float> Tvec;
         cv::Mat raux,taux;
-        
        
-        // What this gives us, is the rot and trans has to be applied to the 3d model to convert it into 
-        // world coordinates so that the corresponsding 3d image is to be formed.
-        // It can also be though of as the transformations that have to be made to the camera
-        // so that the corresponding 2d image of the 3d object is formed...
-        // It means what rotations and translations have to be made to the camera to position
-        // it correctly in the world space.
-        
         
         cv::solvePnP(m_markerCorners3d, m.points, camMatrix, distCoeff,raux,taux);
+        // the raux taux contained, helps us move from the world model coordinate into the camera coordiantes
+        
         raux.convertTo(Rvec,CV_32F);
         taux.convertTo(Tvec ,CV_32F);
         
         cv::Mat_<float> rotMat(3,3);
        
         cv::Mat viewMatrix(4, 4, CV_32F); // This will hold the combined rot and trans
-
         cv::Rodrigues(Rvec, rotMat);
        
        
         // Copy to tranformation matrix. This matrix will be able to move from model coor to camera coor
         // Docs : rotMat and TVec is actually used to transfrom from the object coordinate to the camera coor.
-                // Not the location of the camera in the model coor. So the transformations can be applied to a 
-                // model to bring it into camera coor. Keep in mind that the axises are a bit different.
+        // Not the location of the camera in the model coor. So the transformations can be applied to a 
+        // model to bring it into camera coor. Keep in mind that the axises are a bit different.
         
-                // There is conflicting information here : Some say the axis is : up : Y , right : X , out of camra : Z(along view)
-                //                                         others say   axis is : up : X , right : Y , out of camera : Z
+        // There is conflicting information here : Some say the axis is : up : Y , right : X , out of camra : Z(along view)
+        //                                         others say   axis is : up : X , right : Y , out of camera : Z
+        
         viewMatrix( cv::Range(0,3) , cv::Range(0,3)) = rotMat * 1;
-        
         viewMatrix( cv::Range(0,3) , cv::Range(3,4)) = Tvec *1;
        
         
-        float *p = viewMatrix.ptr<float>(3); // Access as float instead of double
+        float *p = viewMatrix.ptr<float>(3); 
         p[0] = p[1] = p[2] = 0; p[3] = 1;
         
         // Convert to OpenGL Format
-
-        std::cout << " LEFT HANDED : " << viewMatrix << std::endl; ;
 
         // convert from left hand coor in opencv to right handed coor in opengl and scenekit
         cv::Mat cvToGl = cv::Mat::zeros(4, 4, CV_32F);
@@ -416,27 +407,11 @@ void KeyPointDetector::estimatePosition(std::vector<Marker>& detectedMarkers)
         cvToGl.at<float>(1, 0) = -1.0f; // Invert the y axis.
         cvToGl.at<float>(2, 2) = -1.0f; // invert the z axis
         cvToGl.at<float>(3, 3) = 1.0f;
-            // ERROR : POSSIBILITY
-        viewMatrix = cvToGl * viewMatrix; // This is right, for what I read in open cv.
 
-        /*
-            When moving from a left handed system to a right handed system.
-        
-            How do I invert the axis ? How to make sure that this transformation
-            is done properly ?
-        
-            In the old way of using open gl directly. I was not inverting the axis.
-            But I might have been handling it in the projection matrix.
-       
-            Other things to keep in mind.
-        
-         */
-        
+        viewMatrix = cvToGl * viewMatrix;
         
         m.transformation = viewMatrix;
       
-        std::cout << "RIGHT HANDED : " << viewMatrix << std::endl; ;
-
         
     }
 }
