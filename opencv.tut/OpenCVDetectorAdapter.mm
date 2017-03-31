@@ -110,55 +110,36 @@
            [self.acceptor acceptTransforms:[NSArray arrayWithArray:array]];
 }
 
--(SCNMatrix4) transformToSceneKit:(cv::Mat&) openGL_transform  // This matrix is in the opengl format
+-(SCNMatrix4) transformToSceneKit:(cv::Mat&) RightHandtransform
 {
     SCNMatrix4 mat = SCNMatrix4Identity;
     
+    // RightHandtransform is column major
     // Scene Kit is row major.
-   
-    /*
-        In open cv and open gl the data is stored like this :
-            
-        ROT | TRAN
-        0   |   1
-    
-        In Scene kit
-     
-        ROT | 0
-         _    _
-        TRAN 1
-     
-        Here the transform has to be in the format for OpenGL
-     
-     */
-    
-    openGL_transform = openGL_transform.t();
-    // This is necessary to convert from the column major ordering of the
-    // rotation and translation to the row major odering of the rot and tran
-    
+    RightHandtransform = RightHandtransform.t();
     
     // Copy the rotation rows
     // Copy the first row.
-    mat.m11 = openGL_transform.at<float>(0,0);
-    mat.m12 = openGL_transform.at<float>(0,1);
-    mat.m13 = openGL_transform.at<float>(0,2);
-    mat.m14 = openGL_transform.at<float>(0,3);
+    mat.m11 = RightHandtransform.at<float>(0,0);
+    mat.m12 = RightHandtransform.at<float>(0,1);
+    mat.m13 = RightHandtransform.at<float>(0,2);
+    mat.m14 = RightHandtransform.at<float>(0,3);
    
-    mat.m21 = openGL_transform.at<float>(1,0);
-    mat.m22 = openGL_transform.at<float>(1,1);
-    mat.m23 = openGL_transform.at<float>(1,2);
-    mat.m24 = openGL_transform.at<float>(1,3);
+    mat.m21 = RightHandtransform.at<float>(1,0);
+    mat.m22 = RightHandtransform.at<float>(1,1);
+    mat.m23 = RightHandtransform.at<float>(1,2);
+    mat.m24 = RightHandtransform.at<float>(1,3);
     
-    mat.m31 = openGL_transform.at<float>(2,0);
-    mat.m32 = openGL_transform.at<float>(2,1);
-    mat.m33 = openGL_transform.at<float>(2,2);
-    mat.m34 = openGL_transform.at<float>(2,3);
+    mat.m31 = RightHandtransform.at<float>(2,0);
+    mat.m32 = RightHandtransform.at<float>(2,1);
+    mat.m33 = RightHandtransform.at<float>(2,2);
+    mat.m34 = RightHandtransform.at<float>(2,3);
     
-    //Copy the translation row. Which is the bottom row in OpenGL /SceneKIT
-    mat.m41 = openGL_transform.at<float>(3,0);
-    mat.m42 = openGL_transform.at<float>(3,1);
-    mat.m43 = openGL_transform.at<float>(3,2);
-    mat.m44 = openGL_transform.at<float>(3,3);
+    //Copy the translation row. Which is the bottom row in SceneKIT
+    mat.m41 = RightHandtransform.at<float>(3,0);
+    mat.m42 = RightHandtransform.at<float>(3,1);
+    mat.m43 = RightHandtransform.at<float>(3,2);
+    mat.m44 = RightHandtransform.at<float>(3,3);
  
     return mat;
 }

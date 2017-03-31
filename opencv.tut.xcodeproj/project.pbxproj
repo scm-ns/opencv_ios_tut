@@ -184,7 +184,7 @@
 				TargetAttributes = {
 					36939D9B1E5E6DC400F7E160 = {
 						CreatedOnToolsVersion = 8.2.1;
-						DevelopmentTeam = B8389ZXE5K;
+						DevelopmentTeam = W7PDGJHBGF;
 						LastSwiftMigration = 0820;
 						ProvisioningStyle = Automatic;
 					};
@@ -346,7 +346,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				DEFINES_MODULE = NO;
-				DEVELOPMENT_TEAM = B8389ZXE5K;
+				DEVELOPMENT_TEAM = W7PDGJHBGF;
 				FRAMEWORK_SEARCH_PATHS = /Users/scm197/viacom/ar_project/libs;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "$(SRCROOT)/opencv.tut/PrefixHeader.pch";
@@ -369,7 +369,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				DEFINES_MODULE = NO;
-				DEVELOPMENT_TEAM = B8389ZXE5K;
+				DEVELOPMENT_TEAM = W7PDGJHBGF;
 				FRAMEWORK_SEARCH_PATHS = /Users/scm197/viacom/ar_project/libs;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "$(SRCROOT)/opencv.tut/PrefixHeader.pch";

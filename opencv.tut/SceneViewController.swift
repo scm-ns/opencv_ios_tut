@@ -49,8 +49,16 @@ class SceneViewController: UIViewController
     fileprivate var sceneView : SCNView? = nil
     fileprivate let cameraNode = SCNNode()
     fileprivate var itemNode : SCNNode? = nil
-    
+   
+    fileprivate var singleNodeTransform : SCNMatrix4! = nil
+    fileprivate var singleBoxNode :SCNNode! = nil
     fileprivate var nodeTransforms : [SCNMatrix4] = []
+    {
+        willSet
+        {
+                singleNodeTransform =  newValue.isEmpty ? singleNodeTransform : newValue[0]
+        }
+    }
     
     init()
     {
@@ -83,7 +91,7 @@ class SceneViewController: UIViewController
         self.setupSceneKitView()
         self.setupSceneKitCamera()
         self.setupLights()
-        
+        self.positionCube()
         self.cameraSession?.startRunning()
     }
 
@@ -173,21 +181,38 @@ class SceneViewController: UIViewController
             self.sceneView?.pointOfView = self.cameraNode  // Without setting this property, the camera and its prespective is not used.
       
             self.sceneView?.autoenablesDefaultLighting = true
-       
-            /*
+        
             // USED FOR DEBUGGING AND ORITENTING THE AXIS
-            let boxGeometry = SCNBox(width: 0.3, height: 0.3, length: 0.3, chamferRadius: 0.0)
-            boxGeometry.firstMaterial!.diffuse.contents = UIColor.red
-            boxGeometry.firstMaterial!.specular.contents = UIColor.white
-            let boxNode = SCNNode(geometry: boxGeometry)
-            boxNode.position = SCNVector3Make(0, 0, -5)
-            scene.rootNode.addChildNode(boxNode)
-      
-            // add animation to box node
-            boxNode.runAction(SCNAction.repeatForever(SCNAction.rotateBy(x: CGFloat(90.degreesToRadians), y: CGFloat(0.degreesToRadians), z: CGFloat(0.degreesToRadians), duration: 3)))
-            */
-       
+            self.addDebugingHelpers()
     }
+    
+    func addDebugingHelpers()
+    {
+        
+        let boxGeometryX = SCNBox(width: 0.3, height: 0.3, length: 0.3, chamferRadius: 0.0)
+        boxGeometryX.firstMaterial!.diffuse.contents = UIColor.red
+        boxGeometryX.firstMaterial!.specular.contents = UIColor.white
+    
+        let boxNodeX = SCNNode(geometry: boxGeometryX)
+        boxNodeX.position = SCNVector3Make(0, 0, -5)
+        scene.rootNode.addChildNode(boxNodeX)
+  
+        // add animation to box node
+        boxNodeX.runAction(SCNAction.repeatForever(SCNAction.rotateBy(x: CGFloat(90.degreesToRadians), y: CGFloat(0.degreesToRadians), z: CGFloat(0.degreesToRadians), duration: 3)))
+
+        let boxGeometryY = SCNBox(width: 0.3, height: 0.3, length: 0.3, chamferRadius: 0.0)
+        boxGeometryY.firstMaterial!.diffuse.contents = UIColor.green
+        boxGeometryY.firstMaterial!.specular.contents = UIColor.white
+    
+        let boxNodeY = SCNNode(geometry: boxGeometryY)
+        boxNodeY.position = SCNVector3Make(0 , 0 , -4)
+        scene.rootNode.addChildNode(boxNodeY)
+    
+        boxNodeY.runAction(SCNAction.repeatForever(SCNAction.rotateBy(x: CGFloat(0.degreesToRadians), y: CGFloat(90.degreesToRadians), z: CGFloat(0.degreesToRadians), duration: 3)))
+     
+    
+    }
+    
    
     func setupLights()
     {
@@ -222,7 +247,18 @@ class SceneViewController: UIViewController
             self.sceneView?.contentMode = .scaleAspectFit
             self.view.addSubview(self.sceneView!)
     }
- 
+
+    func positionCube()
+    {
+        let boxGeometry = SCNPyramid()
+        self.singleBoxNode = SCNNode(geometry: boxGeometry)
+        
+        self.singleBoxNode.eulerAngles = SCNVector3Make(-(Float)(90.degreesToRadians),0, 0)
+        
+        scene.rootNode.addChildNode(self.singleBoxNode)
+        
+    }
+    
 }
 
 extension SceneViewController : SCNSceneRendererDelegate
@@ -240,31 +276,8 @@ extension SceneViewController : SCNSceneRendererDelegate
     */
     func renderer(_ renderer: SCNSceneRenderer, updateAtTime time: TimeInterval)
     {
-      
-        // Remove all the previously drawn items
-        // Inefficient work on
-        for node in self.scene.rootNode.childNodes
-        {
-            if node.name == "temp"
-            {
-                node.removeFromParentNode()
-            }
-        }
-     
-        for transform in self.nodeTransforms // If items have been identified. Then place an object on top of it.
-        {
-            // Position the model in the right location in the 3D camera coor
-            
-            let boxGeometry = SCNPyramid()
-            let boxNode = SCNNode(geometry: boxGeometry)
-            boxNode.name = "temp"
-            
-            boxNode.transform = transform
-            boxNode.eulerAngles = SCNVector3Make(-(Float)(90.degreesToRadians),0 , 0)
-            
-            scene.rootNode.addChildNode(boxNode)
-        }
-        
+        // Position the model in the right location in the 3D camera coor
+        singleBoxNode.transform = singleNodeTransform ?? SCNMatrix4Identity
     }
     
     func printNodeProperty(node : SCNNode)
