@@ -52,6 +52,8 @@ class SceneViewController: UIViewController
    
     fileprivate var singleNodeTransform : SCNMatrix4! = nil
     fileprivate var singleBoxNode :SCNNode! = nil
+    fileprivate var singleModelNode :SCNNode? = nil
+    
     fileprivate var nodeTransforms : [SCNMatrix4] = []
     {
         willSet
@@ -91,7 +93,9 @@ class SceneViewController: UIViewController
         self.setupSceneKitView()
         self.setupSceneKitCamera()
         self.setupLights()
-        self.positionCube()
+        //self.positionCube()
+        self.positionModel()
+        
         self.cameraSession?.startRunning()
     }
 
@@ -181,6 +185,8 @@ class SceneViewController: UIViewController
             self.sceneView?.pointOfView = self.cameraNode  // Without setting this property, the camera and its prespective is not used.
       
             self.sceneView?.autoenablesDefaultLighting = true
+       
+            //self.sceneView?.allowsCameraControl = true
         
             // USED FOR DEBUGGING AND ORITENTING THE AXIS
             self.addDebugingHelpers()
@@ -251,6 +257,9 @@ class SceneViewController: UIViewController
     func positionCube()
     {
         let boxGeometry = SCNPyramid()
+        boxGeometry.firstMaterial!.diffuse.contents = UIColor.blue
+        boxGeometry.firstMaterial!.specular.contents = UIColor.white
+        
         self.singleBoxNode = SCNNode(geometry: boxGeometry)
         
         self.singleBoxNode.eulerAngles = SCNVector3Make(-(Float)(90.degreesToRadians),0, 0)
@@ -258,6 +267,27 @@ class SceneViewController: UIViewController
         scene.rootNode.addChildNode(self.singleBoxNode)
         
     }
+    
+    
+    func positionModel()
+    {
+        self.singleModelNode = loadArtModel(scene: "base_human" , node:"base_human_armtr")
+        
+        guard let singleModelNode = singleModelNode else {return}
+      
+        self.scene.rootNode.addChildNode(singleModelNode)
+        
+    }
+
+    
+    
+    func loadArtModel(scene:String , node :String) -> SCNNode?
+    {
+        let scene = SCNScene(named: "art.scnassets/\(scene).dae")
+        
+        return scene?.rootNode.childNode(withName: node,recursively: true)
+    }
+    
     
 }
 
@@ -277,7 +307,7 @@ extension SceneViewController : SCNSceneRendererDelegate
     func renderer(_ renderer: SCNSceneRenderer, updateAtTime time: TimeInterval)
     {
         // Position the model in the right location in the 3D camera coor
-        singleBoxNode.transform = singleNodeTransform ?? SCNMatrix4Identity
+        //singleModelNode?.transform = singleNodeTransform ?? SCNMatrix4Identity
     }
     
     func printNodeProperty(node : SCNNode)

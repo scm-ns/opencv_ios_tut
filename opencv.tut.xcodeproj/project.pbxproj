@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3622E9801E8EEAF100807A11 /* Common.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3622E97F1E8EEAF100807A11 /* Common.swift */; };
 		3660FEB11E79DD25003B4907 /* SceneViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3660FEB01E79DD25003B4907 /* SceneViewController.swift */; };
 		3660FED31E79EE92003B4907 /* art.scnassets in Resources */ = {isa = PBXBuildFile; fileRef = 3660FED21E79EE92003B4907 /* art.scnassets */; };
 		3660FED61E7A77FA003B4907 /* OpenCVDetectorAdapter.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3660FED51E7A77FA003B4907 /* OpenCVDetectorAdapter.mm */; };
@@ -29,6 +30,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		3622E97F1E8EEAF100807A11 /* Common.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Common.swift; sourceTree = "<group>"; };
 		3660FEAF1E79DD25003B4907 /* opencv.tut-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "opencv.tut-Bridging-Header.h"; sourceTree = "<group>"; };
 		3660FEB01E79DD25003B4907 /* SceneViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SceneViewController.swift; sourceTree = "<group>"; };
 		3660FED21E79EE92003B4907 /* art.scnassets */ = {isa = PBXFileReference; lastKnownFileType = wrapper.scnassets; path = art.scnassets; sourceTree = "<group>"; };
@@ -111,6 +113,7 @@
 				36939D9F1E5E6DC400F7E160 /* Supporting Files */,
 				36D137311E5E181900B7F1FE /* UIImage+OpenCV.h */,
 				36D137321E5E181900B7F1FE /* UIImage+OpenCV.mm */,
+				3622E97F1E8EEAF100807A11 /* Common.swift */,
 			);
 			path = opencv.tut;
 			sourceTree = "<group>";
@@ -234,6 +237,7 @@
 				36D137331E5E181900B7F1FE /* UIImage+OpenCV.mm in Sources */,
 				36939DA11E5E6DC400F7E160 /* main.m in Sources */,
 				3660FED61E7A77FA003B4907 /* OpenCVDetectorAdapter.mm in Sources */,
+				3622E9801E8EEAF100807A11 /* Common.swift in Sources */,
 				36E9E9DB1E6668BC00636730 /* Marker.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
